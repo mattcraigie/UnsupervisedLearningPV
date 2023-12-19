@@ -70,6 +70,7 @@ def pv_detection(config):
 
         # save results to csv
         df = pd.DataFrame(all_scores)
+        df['ratio_left'] = ratios
         df.to_csv(os.path.join(model_folder, 'sensitivity.csv'), index=False)
 
     elif analysis_type == 'data_scaling':
@@ -86,6 +87,7 @@ def pv_detection(config):
 
         # save results to csv
         df = pd.DataFrame(all_scores)
+        df['num_train_val_mocks'] = data_sizes
         df.to_csv(os.path.join(model_folder, 'data_scaling.csv'), index=False)
 
 
