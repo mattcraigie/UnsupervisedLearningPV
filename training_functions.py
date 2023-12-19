@@ -6,7 +6,7 @@ import os
 from scipy.stats import ks_2samp
 
 from models import NFSTRegressor, CNN, MSTRegressor
-from bootstrapping import get_bootstrap_score, get_mean_diffs
+from bootstrapping import get_bootstrap_score, get_bootstrap_means, get_diffs
 from mocks import create_parity_violating_mocks
 
 model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
@@ -92,8 +92,8 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
     if num_verification_catalogs is not None:
         # run the best model on the full many-universe test to verify the bootstrap std matches the std of the many-universe test
 
-        bootstrap_means = get_mean_diffs(best_model, test_loader)
-        bootstrap_std = bootstrap_means.std(0)
+        bootstrap_means = get_bootstrap_means(best_model, test_loader)
+        bootstrap_std = bootstrap_means.std()
         output_dict['bootstrap_std'] = bootstrap_std
 
 
@@ -103,16 +103,16 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
             verification_mocks = torch.from_numpy(verification_mocks).float().unsqueeze(1)
             data_handler = DataHandler(verification_mocks)
             verification_loader = data_handler.make_single_dataloader(batch_size=64)
-            verification_means.append(get_mean_diffs(best_model, verification_loader))
+            verification_means.append(get_diffs(best_model, verification_loader).mean())
 
-        verification_means = np.array(verification_means)
-        verification_std = verification_means.std(0)
+        verification_means = torch.tensor(verification_means)
+        verification_std = verification_means.std()
 
         output_dict['verification_std'] = verification_std
 
         # 2 sample KS test
-        output_dict['ks_test_pvalue'] = ks_2samp(bootstrap_means - bootstrap_means.mean(0),
-                                          verification_means - verification_means.mean(0))[1]
+        output_dict['ks_test_pvalue'] = ks_2samp(bootstrap_means - bootstrap_means.mean(),
+                                          verification_means - verification_means.mean())[1]
 
     return output_dict
 
