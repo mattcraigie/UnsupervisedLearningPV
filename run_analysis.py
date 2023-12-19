@@ -20,8 +20,6 @@ def pv_detection(config):
     """
     # Load configuration settings
 
-
-
     device = config['device']
 
     analysis_type = config['analysis_type']
@@ -37,8 +35,6 @@ def pv_detection(config):
 
     model_folder = os.path.join(analysis_folder, analysis_config['model_type'])
     os.makedirs(model_folder, exist_ok=True)
-
-    analysis_config['output_root'] = model_folder
 
     # set up logging
 
@@ -65,8 +61,15 @@ def pv_detection(config):
         ratios = analysis_config['mock_kwargs']['ratio_left']
 
         for i in range(len(ratios)):
-            logging.info(f"Running with balance {ratios[i]}")
+
+            ratio_folder = os.path.join(model_folder, f'ratio_{i}')
+            os.makedirs(ratio_folder, exist_ok=True)
+            analysis_config['output_root'] = ratio_folder
+
             analysis_config['mock_kwargs']['ratio_left'] = ratios[i]
+
+            logging.info(f"Running with balance {ratios[i]}")
+
             training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
 
             all_training_scores.append(training_scores)

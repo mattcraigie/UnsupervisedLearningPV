@@ -25,9 +25,9 @@ analysis_kwargs:
   # Training specific configurations
   training_kwargs:
     epochs: 50
-    lr: 0.001
-    num_train_val_mocks: 10000  # Use list of many for data scaling analysis
-    num_test_mocks: 5000
+    lr: 0.0001
+    num_train_val_mocks: 5000  # Use list of many for data scaling analysis
+    num_test_mocks: 3000
 
 
   # Additional parameters
