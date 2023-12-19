@@ -5,6 +5,7 @@ analysis_kwargs:
   output_root: "./output/"  # Directory where the analysis folders will be created
   model_type: "nfst"  # Type of model to be used
 
+
   # Model-specific configurations (modify based on the model type)
   model_kwargs:
     size: 32
@@ -28,6 +29,7 @@ analysis_kwargs:
     lr: 0.001
     num_train_val_mocks: 1000  # Use list of many for data scaling analysis
     num_test_mocks: 500
+
 
   # Additional parameters
   repeats: 10
