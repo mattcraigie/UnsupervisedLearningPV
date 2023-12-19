@@ -73,6 +73,8 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
             train_data = self.data[train_idx]
             val_data = self.data[val_idx]
 
+            print(train_data.shape, val_data.shape)
+
             if self.use_targets:
                 val_targets = self.targets[val_idx]
                 train_targets = self.targets[train_idx]
