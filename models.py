@@ -49,6 +49,10 @@ class NFSTRegressor(nn.Module):
 
 class MSTRegressor(nn.Module):
     def __init__(self, size, num_scales, num_angles=4, reduction='asymm_ang_avg', linear_hiddens=128):
+        # This is not the best way to implement. Ideally, we would pre-calculate the MST and then use that as input to the regressor.
+        # However, doing it this way ensures consistency with the NFSTRegressor class. It also means that we can use the same
+        # training loop for both models.
+
         super(MSTRegressor, self).__init__()
 
         self.size = size
@@ -56,7 +60,6 @@ class MSTRegressor(nn.Module):
         self.num_angles = num_angles
 
         self.filters = Morlet(size, num_scales, num_angles)
-        self.filters.update_filters()
 
         self.st = ScatteringTransform2d(self.filters)
         self.reducer = Reducer(self.filters, reduction, filters_3d=False)
