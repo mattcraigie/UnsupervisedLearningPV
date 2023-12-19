@@ -89,7 +89,6 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
     output_dict = {'bootstrap_score': test_bootstrap_score}
 
-
     if num_verification_catalogs is not None:
         # run the best model on the full many-universe test to verify the bootstrap std matches the std of the many-universe test
 
