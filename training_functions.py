@@ -37,6 +37,8 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         save_dirs.append(os.path.join(output_root, f'repeat_{repeat}'))
         os.makedirs(save_dirs[-1], exist_ok=True)
 
+    ### ~~~ TRAINING ~~~ ###
+
     results = []
 
     for repeat in range(repeats):
@@ -71,6 +73,8 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
     # save the bootstrap score at the top level directory
     np.save(os.path.join(output_root, 'bootstrap_scores.npy'), np.array(results))
 
+    ### ~~~ TESTING ~~~ ###
+
     # run the best model on the test set and compute the bootstrap scores
 
     test_mocks = create_parity_violating_mocks(training_kwargs['num_test_mocks'], **mock_kwargs)
@@ -88,6 +92,9 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
 
     output_dict = {'bootstrap_score': test_bootstrap_score}
+
+
+    ### ~~~ VERIFICATION ~~~ ###
 
     if num_verification_catalogs is not None:
         # run the best model on the full many-universe test to verify the bootstrap std matches the std of the many-universe test
@@ -111,8 +118,13 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         output_dict['verification_std'] = verification_std
 
         # 2 sample KS test
-        output_dict['ks_test_pvalue'] = ks_2samp(bootstrap_means - bootstrap_means.mean(),
-                                          verification_means - verification_means.mean())[1]
+        bootstrap_means = bootstrap_means.cpu().numpy()
+        verification_means = verification_means.cpu().numpy()
+
+        shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
+        shifted_verification_means = verification_means - verification_means.mean()
+
+        output_dict['ks_test_pvalue'] = ks_2samp(shifted_bootstrap_means, shifted_verification_means).pvalue
 
     return output_dict
 
