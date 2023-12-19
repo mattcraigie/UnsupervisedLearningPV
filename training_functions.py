@@ -24,7 +24,7 @@ def batch_difference_loss(model, data):
     return -mu_B / sigma_B
 
 
-def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs, save_dir, repeats=1, premade_data=None, num_verification_catalogs=None, device=None):
+def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs, output_root, repeats=1, premade_data=None, num_verification_catalogs=None, device=None):
 
     try:
         model_class = model_lookup[model_type]
@@ -34,7 +34,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
     # make the save dirs for each repeat
     save_dirs = []
     for repeat in range(repeats):
-        save_dirs.append(os.path.join(save_dir, f'repeat_{repeat}'))
+        save_dirs.append(os.path.join(output_root, f'repeat_{repeat}'))
         os.makedirs(save_dirs[-1], exist_ok=True)
 
     results = []
