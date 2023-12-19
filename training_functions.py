@@ -43,14 +43,10 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
         if premade_data is None:
             train_val_mocks = create_parity_violating_mocks(training_kwargs['num_train_val_mocks'], **mock_kwargs)
+            train_val_mocks = torch.from_numpy(train_val_mocks).float().unsqueeze(1)
         else:
             train_val_mocks = premade_data
 
-        if type(train_val_mocks) is not torch.Tensor:
-            train_val_mocks = torch.from_numpy(train_val_mocks).float()
-
-        if len(train_val_mocks.shape) == 3:
-            train_val_mocks = train_val_mocks.unsqueeze(1)
 
         data_handler = DataHandler(train_val_mocks)
         train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.2)
@@ -78,6 +74,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
     # run the best model on the test set and compute the bootstrap scores
 
     test_mocks = create_parity_violating_mocks(training_kwargs['num_test_mocks'], **mock_kwargs)
+    test_mocks = torch.from_numpy(test_mocks).float().unsqueeze(1)
 
     data_handler = DataHandler(test_mocks)
 
@@ -103,6 +100,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         verification_means = []
         for i in range(num_verification_catalogs):
             verification_mocks = create_parity_violating_mocks(training_kwargs['num_test_mocks'], **mock_kwargs)
+            verification_mocks = torch.from_numpy(verification_mocks).float().unsqueeze(1)
             data_handler = DataHandler(verification_mocks)
             verification_loader = data_handler.make_single_dataloader(batch_size=64)
             verification_means.append(get_mean_diffs(best_model, verification_loader))
