@@ -47,7 +47,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
             train_val_mocks = premade_data
 
         if type(train_val_mocks) is not torch.Tensor:
-            train_val_mocks = torch.from_numpy(train_val_mocks).float()
+            train_val_mocks = torch.from_numpy(train_val_mocks).float().unsqueeze(1)
 
         data_handler = DataHandler(train_val_mocks)
         train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.2)
