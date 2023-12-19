@@ -1,25 +1,15 @@
-from create_mocks import make_3d_mocks
-from dlutils.training import RegressionTrainer, batch_apply
+from dlutils.training import RegressionTrainer
 from dlutils.data import DataHandler
 import torch
-from torch import nn
-import copy
 import numpy as np
-import matplotlib.pyplot as plt
-from models import NFSTRegressor, CNN, MSTRegressor
 import os
-
 from scipy.stats import ks_2samp
 
-print('Unshifted:')
-print(ks_2samp(a, b))
-
-print('\nShifted:')
-print(ks_2samp(a - np.mean(a), b - np.mean(b)))
-
-
+from models import NFSTRegressor, CNN, MSTRegressor
 from bootstrapping import get_bootstrap_score, get_mean_diffs
 from mocks import create_parity_violating_mocks
+
+model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
 
 
 def batch_difference_loss(model, data):
@@ -34,22 +24,7 @@ def batch_difference_loss(model, data):
     return -mu_B / sigma_B
 
 
-model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
-
-
 def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs, save_dir, repeats=1, premade_data=None, num_verification_catalogs=None, device=None):
-
-    # we will need
-    # for each model:
-    #   - do analysis repeats times
-    #   - save each model and the corresponding loss curves and bootstrap scores
-    #   - select the best model according to its own validation score
-    #   - run the best model on the test set and compute the bootstrap scores
-    #   - run the best model on the full many-universe test to verify the bootstrap std matches the std of the many-universe test
-
-    # note that mock_kwargs are field_size, total_num_triangles, ratio_left, length_side1, length_side2
-    # training kwargs are epochs and learning_rate, also num_train_val_mocks and num_test_mocks
-    # model kwarsg vary by model type
 
     try:
         model_class = model_lookup[model_type]
@@ -75,10 +50,8 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.2)
 
         torch.manual_seed(repeat)
-        model = model_type(**model_kwargs)
+        model = model_class(**model_kwargs)
         model.to(device)
-        if model_class == NFSTRegressor:
-            model.filters.clip_filters()
 
         trainer = RegressionTrainer(model, train_loader, val_loader, criterion=batch_difference_loss, no_targets=True, device=device)
         trainer.run_training(**training_kwargs, print_progress=False, show_loss_plot=False)

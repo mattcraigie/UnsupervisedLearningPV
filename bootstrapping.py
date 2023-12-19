@@ -39,36 +39,3 @@ def get_bootstrap_score(model, dataloader, num_bootstraps=10000):
         bootstrap_score = (bootstrap_means.mean(0) / bootstrap_means.std(0)).item()
 
         return bootstrap_score
-
-
-num_mocks = 5051
-num_triangles = 32
-mock_size = 32
-repeats = 1000
-
-balance = 0.5
-
-np.random.seed(0)
-
-
-def run_new_catalog(num_mocks, mock_size):
-
-    num_left = round(num_triangles * balance)
-    num_right = round(num_triangles * (1 - balance))
-    mocks = make_2d_mocks(num_mocks, mock_size, 4, 8, num_left) + make_2d_mocks(num_mocks, mock_size, 4, -8, num_right)
-    data = torch.from_numpy(mocks).unsqueeze(1).float()
-
-    data_handler = DataHandler(data)
-    _, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.99)
-
-    return get_mean(model, val_loader)
-
-repeat_scores = []
-
-for repeat in range(repeats):
-    if repeat % 100 == 0:
-        print('Running repeat ', repeat)
-    repeat_scores.append(run_new_catalog(num_mocks, mock_size))
-
-repeat_scores = np.stack(repeat_scores)
-np.save('multi_universe_nosignal_cnn_weak.npy', repeat_scores)

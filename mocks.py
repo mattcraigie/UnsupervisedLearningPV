@@ -1,6 +1,7 @@
 import numpy as np
 from datautils import DataHandler
 
+
 def random_unit_vector_2d():
     vec = np.random.randn(2)  # Change 3 to 2 for 2D
     vec /= np.linalg.norm(vec)

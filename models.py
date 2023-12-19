@@ -2,8 +2,9 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from scattering_transform.scattering_transform import *
-from scattering_transform.filters import *
+from scattering_transform.scattering_transform import ScatteringTransform2d
+from scattering_transform.filters import FourierSubNetFilters, SubNet, Morlet
+from scattering_transform.reducer import Reducer
 
 
 class NFSTRegressor(nn.Module):
@@ -47,8 +48,7 @@ class NFSTRegressor(nn.Module):
 
 
 class MSTRegressor(nn.Module):
-    def __init__(self, size, num_scales, num_angles=4, subnet_hidden_sizes=(32, 32),
-                 reduction='asymm_ang_avg', linear_hiddens=128):
+    def __init__(self, size, num_scales, num_angles=4, reduction='asymm_ang_avg', linear_hiddens=128):
         super(MSTRegressor, self).__init__()
 
         self.size = size

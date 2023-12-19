@@ -7,6 +7,7 @@ import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import yaml
 
 import argparse
 
@@ -15,15 +16,17 @@ from training_functions import train_and_test_model
 from datetime import datetime
 
 
-def pv_detection(rank, args):
+def pv_detection(config):
     """Run the data scaling analysis. Outputs the results to a csv file.
 
     Args:
-        rank (int): The rank of the process.
         args (argparse.Namespace): The command line arguments. This function only uses args.config.
     """
     # Load configuration settings
-    config = args.config
+
+
+
+    device = config['device']
 
     analysis_type = config['analysis_type']
 
@@ -49,9 +52,7 @@ def pv_detection(rank, args):
         logging_filename = os.path.join(model_folder, f'{analysis_type}_{timestamp}.log')
 
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
-
-    logging.basicConfig(filename=logging_filename, level=logging.INFO)
-    logging.info(f"Running on {rank}.")
+    logging.info(f"Running on {device}.")
 
 
     start_time = time.time()
@@ -64,10 +65,10 @@ def pv_detection(rank, args):
 
         ratios = analysis_config['ratio_left']
 
-        for i in range(ratios):
+        for i in range(len(ratios)):
             logging.info(f"Running with balance {ratios[i]}")
             analysis_config['mock_kwargs']['ratio_left'] = ratios[i]
-            output_dict = train_and_test_model(**analysis_config, device=rank)
+            output_dict = train_and_test_model(**analysis_config, device=device)
             all_scores.append(output_dict)
 
         # save results to csv
@@ -80,10 +81,10 @@ def pv_detection(rank, args):
 
         data_sizes = analysis_config['num_train_val_mocks']
 
-        for i in range(data_sizes):
+        for i in range(len(data_sizes)):
             logging.info(f"Running with {data_sizes[i]} training and validation mocks")
             analysis_config['mock_kwargs']['num_train_val_mocks'] = data_sizes[i]
-            output_dict = train_and_test_model(**analysis_config, device=rank)
+            output_dict = train_and_test_model(**analysis_config, device=device)
             all_scores.append(output_dict)
 
         # save results to csv
@@ -102,6 +103,10 @@ if __name__ == '__main__':
     parser.add_argument('--config', type=str, default='config.yaml', help='Path to the configuration file.')
     args = parser.parse_args()
 
-    pv_detection(torch.device('cuda:0'), args)
+    with open(args.config, 'r') as file:
+        config = yaml.safe_load(file)
+
+    # use cuda if args.cuda is set to True
+    pv_detection(config)
 
 

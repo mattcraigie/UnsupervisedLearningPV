@@ -1,4 +1,5 @@
 analysis_type: "sensitivity"  # Change to 'data_scaling' as needed
+device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
   output_root: "./output/"  # Directory where the analysis folders will be created
