@@ -45,7 +45,52 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
             train_val_mocks = create_parity_violating_mocks(training_kwargs['num_train_val_mocks'], **mock_kwargs)
         else:
             train_val_mocks = premade_data
-        print(train_val_mocks.shape)
+
+        def abc(self, batch_size, val_fraction=0.2, shuffle=True, dataset_class=None):
+            from torch.utils.data import TensorDataset, DataLoader
+            from dlutils.data import DataHandler
+
+            """
+            Makes dataloaders for the simulated data
+            :param batch_size: the batch size for the dataloaders
+            :param val_fraction: the fraction of the data to use for validation
+            :param shuffle: whether or not to shuffle the data
+            :param dataset_class: the class to use for the dataset. Defaults to TensorDataset
+            :return:
+            """
+
+            if dataset_class is None:
+                dataset_class = TensorDataset
+
+            # shuffle data
+            num_data = self.data.shape[0]
+            train_fraction = 1 - val_fraction
+            num_train = int(num_data * train_fraction)
+            shuffle_idx = torch.randperm(num_data) if shuffle else torch.arange(num_data)
+            train_idx = shuffle_idx[:num_train]
+            val_idx = shuffle_idx[num_train:]
+
+            train_data = self.data[train_idx]
+            val_data = self.data[val_idx]
+
+            if self.use_targets:
+                val_targets = self.targets[val_idx]
+                train_targets = self.targets[train_idx]
+                train_dataset = dataset_class(train_data, train_targets)
+                val_dataset = dataset_class(val_data, val_targets)
+            else:
+                train_dataset = dataset_class(train_data)
+                val_dataset = dataset_class(val_data)
+
+            # create dataloaders
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
+
+            return train_loader, val_loader
+
+        DataHandler.make_dataloaders = abc
+
+
         data_handler = DataHandler(train_val_mocks)
         train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.2)
 
@@ -67,7 +112,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         results.append(bootstrap_score)
 
     # save the bootstrap score at the top level directory
-    np.save(os.path.join(save_dir, 'bootstrap_scores.npy'), np.array(results))
+    np.save(os.path.join(output_root, 'bootstrap_scores.npy'), np.array(results))
 
     # run the best model on the test set and compute the bootstrap scores
 
