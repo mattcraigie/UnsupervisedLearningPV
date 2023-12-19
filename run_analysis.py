@@ -58,7 +58,7 @@ def pv_detection(config):
 
         all_scores = []
 
-        ratios = analysis_config['ratio_left']
+        ratios = analysis_config['mock_kwargs']['ratio_left']
 
         for i in range(len(ratios)):
             logging.info(f"Running with balance {ratios[i]}")
