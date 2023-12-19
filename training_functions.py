@@ -45,7 +45,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
             train_val_mocks = create_parity_violating_mocks(training_kwargs['num_train_val_mocks'], **mock_kwargs)
         else:
             train_val_mocks = premade_data
-
+        print(train_val_mocks.shape)
         data_handler = DataHandler(train_val_mocks)
         train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.2)
 

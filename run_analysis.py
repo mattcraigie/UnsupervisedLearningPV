@@ -37,6 +37,8 @@ def pv_detection(config):
     model_folder = os.path.join(analysis_folder, analysis_config['model_type'])
     os.makedirs(model_folder, exist_ok=True)
 
+    analysis_config['output_root'] = model_folder
+
     # set up logging
 
     logging_filename = os.path.join(model_folder, f'{analysis_type}.log')

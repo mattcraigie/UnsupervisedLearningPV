@@ -2,7 +2,7 @@ analysis_type: "sensitivity"  # Change to 'data_scaling' as needed
 device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
-  output_root: "./output/sensitivity/nfst/"  # Directory where the analysis folders will be created
+  output_root: "./output/"  # Directory where the analysis folders will be created
   model_type: "nfst"  # Type of model to be used
 
   # Model-specific configurations (modify based on the model type)
@@ -17,8 +17,8 @@ analysis_kwargs:
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
-    total_num_triangles: 1000
-    ratio_left: [0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]  # Use list of many for sensitivity analysis
+    total_num_triangles: 100
+    ratio_left: [0.5, 0.7] #[0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
 
@@ -26,10 +26,10 @@ analysis_kwargs:
   training_kwargs:
     epochs: 50
     learning_rate: 0.001
-    num_train_val_mocks: 10000  # Use list of many for data scaling analysis
-    num_test_mocks: 5000
+    num_train_val_mocks: 1000  # Use list of many for data scaling analysis
+    num_test_mocks: 500
 
   # Additional parameters
   repeats: 10
-  num_verification_catalogs: 1000
+  num_verification_catalogs: 100
   premade_data: null
