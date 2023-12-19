@@ -86,7 +86,7 @@ class MSTRegressor(nn.Module):
 
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, dummy_input):
         super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 100, 11, padding=5)
         self.pool = nn.MaxPool2d(2, 2)
