@@ -118,7 +118,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         output_dict['verification_std'] = verification_std
 
         # 2 sample KS test
-        bootstrap_means = bootstrap_means.numpy()
+        bootstrap_means = bootstrap_means.numpy().squeeze(1)
         verification_means = verification_means.numpy()
 
         shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
