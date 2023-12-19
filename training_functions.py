@@ -124,9 +124,6 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
         shifted_verification_means = verification_means - verification_means.mean()
 
-        print(shifted_bootstrap_means.shape)
-        print(shifted_verification_means.shape)
-
         output_dict['ks_test_pvalue'] = ks_2samp(shifted_bootstrap_means, shifted_verification_means).pvalue
 
     return output_dict

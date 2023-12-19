@@ -11,7 +11,6 @@ def get_diffs(model, dataloader):
             diff = (output - output_flip).cpu().detach()
             diffs.append(diff)
         diffs = torch.cat(diffs, dim=0)
-        print(diffs.shape)
         return diffs
 
 def get_bootstrap_means(model, dataloader, num_bootstraps=10000):
@@ -25,7 +24,6 @@ def get_bootstrap_means(model, dataloader, num_bootstraps=10000):
 
     # Compute the mean of bootstrap means
     bootstrap_means = torch.stack(bootstrap_means)
-    print(bootstrap_means.shape)
 
     return bootstrap_means
 
