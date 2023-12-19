@@ -1,5 +1,5 @@
 import numpy as np
-from datautils import DataHandler
+from dlutils.data import DataHandler
 
 
 def random_unit_vector_2d():

@@ -1,12 +1,8 @@
-import numpy as np
 import os
 import pandas as pd
 import logging
 import time
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
 import yaml
 
 import argparse
@@ -14,7 +10,6 @@ import argparse
 from training_functions import train_and_test_model
 
 from datetime import datetime
-
 
 def pv_detection(config):
     """Run the data scaling analysis. Outputs the results to a csv file.
