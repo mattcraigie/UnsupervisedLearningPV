@@ -3,7 +3,7 @@ device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
   output_root: "./output/"  # Directory where the analysis folders will be created
-  model_type: "nfst"  # Type of model to be used
+  model_type: "mst"  # Type of model to be used
 
 
   # Model-specific configurations (modify based on the model type)
@@ -11,7 +11,6 @@ analysis_kwargs:
     size: 32
     num_scales: 3
     num_angles: 4
-    subnet_hidden_sizes: [32, 32]
     reduction: 'asymm_ang_avg'
     linear_hiddens: 128
 
