@@ -100,7 +100,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
         bootstrap_means = get_bootstrap_means(best_model, test_loader)
         bootstrap_std = bootstrap_means.std()
-        output_dict['bootstrap_std'] = bootstrap_std
+        output_dict['bootstrap_std'] = bootstrap_std.item()
 
 
         verification_means = []
@@ -114,7 +114,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
         verification_means = torch.tensor(verification_means)
         verification_std = verification_means.std()
 
-        output_dict['verification_std'] = verification_std
+        output_dict['verification_std'] = verification_std.item()
 
         # 2 sample KS test
         bootstrap_means = bootstrap_means.numpy().squeeze(1)
