@@ -39,7 +39,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
     ### ~~~ TRAINING ~~~ ###
 
-    results = []
+    training_scores = []
 
     for repeat in range(repeats):
 
@@ -68,10 +68,9 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
         # get the booststrap score
         bootstrap_score = get_bootstrap_score(model, val_loader)
-        results.append(bootstrap_score)
+        training_scores.append(bootstrap_score)
 
-    # save the bootstrap score at the top level directory
-    np.save(os.path.join(output_root, 'bootstrap_scores.npy'), np.array(results))
+    training_scores = np.array(training_scores)
 
     ### ~~~ TESTING ~~~ ###
 
@@ -126,5 +125,5 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
         output_dict['ks_test_pvalue'] = ks_2samp(shifted_bootstrap_means, shifted_verification_means).pvalue
 
-    return output_dict
+    return training_scores, output_dict
 

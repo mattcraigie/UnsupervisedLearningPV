@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import logging
 import time
+import numpy as np
 
 import yaml
 
@@ -58,37 +59,47 @@ def pv_detection(config):
 
     if analysis_type == 'sensitivity':
 
-        all_scores = []
+        all_training_scores = []
+        all_outputs = []
 
         ratios = analysis_config['mock_kwargs']['ratio_left']
 
         for i in range(len(ratios)):
             logging.info(f"Running with balance {ratios[i]}")
             analysis_config['mock_kwargs']['ratio_left'] = ratios[i]
-            output_dict = train_and_test_model(**analysis_config, device=device)
-            all_scores.append(output_dict)
+            training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
+
+            all_training_scores.append(training_scores)
+            all_outputs.append(output_dict)
 
         # save results to csv
-        df = pd.DataFrame(all_scores)
+        df = pd.DataFrame(all_outputs)
         df['ratio_left'] = ratios
         df.to_csv(os.path.join(model_folder, 'sensitivity.csv'), index=False)
 
+        np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
+
     elif analysis_type == 'data_scaling':
 
-        all_scores = []
+        all_training_scores = []
+        all_outputs = []
 
         data_sizes = analysis_config['num_train_val_mocks']
 
         for i in range(len(data_sizes)):
             logging.info(f"Running with {data_sizes[i]} training and validation mocks")
             analysis_config['mock_kwargs']['num_train_val_mocks'] = data_sizes[i]
-            output_dict = train_and_test_model(**analysis_config, device=device)
-            all_scores.append(output_dict)
+            training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
+
+            all_training_scores.append(training_scores)
+            all_outputs.append(output_dict)
 
         # save results to csv
-        df = pd.DataFrame(all_scores)
+        df = pd.DataFrame(all_outputs)
         df['num_train_val_mocks'] = data_sizes
         df.to_csv(os.path.join(model_folder, 'data_scaling.csv'), index=False)
+
+        np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
 
 
 
