@@ -84,7 +84,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
     test_loader = data_handler.make_single_dataloader(batch_size=64)
 
     best_model = model_class(**model_kwargs)
-    best_model.load_state_dict(torch.load(os.path.join(save_dirs[np.argmax(results)], 'model.pt')))
+    best_model.load_state_dict(torch.load(os.path.join(save_dirs[np.argmax(training_scores)], 'model.pt')))
     best_model.to(device)
 
     test_bootstrap_score = get_bootstrap_score(best_model, test_loader)
