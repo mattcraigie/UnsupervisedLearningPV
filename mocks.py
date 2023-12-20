@@ -2,42 +2,43 @@ import numpy as np
 from dlutils.data import DataHandler
 
 
-def random_unit_vector_2d():
-    vec = np.random.randn(2)  # Change 3 to 2 for 2D
-    vec /= np.linalg.norm(vec)
+def random_unit_vector_2d(num_vectors):
+    vec = np.random.randn(num_vectors, 2)
+    vec /= np.linalg.norm(vec, axis=1)[:, np.newaxis]
     return vec
 
 
-def get_random_orthog_vecs_2d():
-    # Align i with the random unit vector
-    i = random_unit_vector_2d()
-
-    # Calculate j based on i
-    j = np.array([-i[1], i[0]])  # Perpendicular vector in 2D
-
+def get_random_orthog_vecs_2d(num_vectors):
+    i = random_unit_vector_2d(num_vectors)
+    j = np.stack([-i[:, 1], i[:, 0]], axis=1)
     return i, j
 
 
 def add_triangle_to_grid(size, a, b, num_triangles):
-    # a and b are the sizes of the triangle legs
-    grid = np.zeros((size, size), dtype=int)  # Change to 2D grid
-    for i in range(num_triangles):
-        # Choose a random position for the first point
-        x1, y1 = np.random.randint(0, size), np.random.randint(0, size)
-        point_1 = np.array([x1, y1])
+    grid = np.zeros((size, size), dtype=int)
+    x1, y1 = np.random.randint(0, size, (2, num_triangles))
+    point_1 = np.stack([x1, y1], axis=1)
 
-        direction_2, direction_3 = get_random_orthog_vecs_2d()
+    direction_2, direction_3 = get_random_orthog_vecs_2d(num_triangles)
 
-        # Calculate the position of the points
-        point_2 = point_1 + (a * direction_2).astype(int)
-        point_3 = point_1 + (b * direction_3).astype(int)
+    point_2 = point_1 + (a * direction_2).astype(int)
+    point_3 = point_1 + (b * direction_3).astype(int)
 
-        # Add the points to the grid, wrapping if they go over
-        for p in [point_1, point_2, point_3]:
-            p = p % size
-            grid[p[0], p[1]] += 1
+    for p in [point_1, point_2, point_3]:
+        p = p % size
+        np.add.at(grid, tuple(p.T), 1)
 
     return grid
+
+
+def make_2d_mocks(num_mocks, size, a, b, num_triangles):
+    all_mocks = np.zeros((num_mocks, size, size))
+
+    for i in range(num_mocks):
+        resulting_grid = add_triangle_to_grid(size, a, b, num_triangles)
+        all_mocks[i] = resulting_grid
+
+    return all_mocks
 
 
 def make_triangle_mocks(num_mocks, size, a, b, num_triangles):
