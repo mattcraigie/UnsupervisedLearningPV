@@ -87,7 +87,7 @@ def pv_detection(config):
         all_training_scores = []
         all_outputs = []
 
-        data_sizes = analysis_config['num_train_val_mocks']
+        data_sizes = analysis_config['training_kwargs']['num_train_val_mocks']
 
         for i in range(len(data_sizes)):
 
@@ -95,7 +95,7 @@ def pv_detection(config):
             os.makedirs(datascaling_folder, exist_ok=True)
             analysis_config['output_root'] = datascaling_folder
 
-            analysis_config['mock_kwargs']['num_train_val_mocks'] = data_sizes[i]
+            analysis_config['training_kwargs']['num_train_val_mocks'] = data_sizes[i]
 
             logging.info(f"Running with {data_sizes[i]} training and validation mocks")
             training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
