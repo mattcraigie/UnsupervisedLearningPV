@@ -17,8 +17,8 @@ analysis_kwargs:
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
-    total_num_triangles: 64
-    ratio_left: 0.8  # Use list of many for sensitivity analysis
+    total_num_triangles: 32
+    ratio_left: 0.7  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
 
