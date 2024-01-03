@@ -7,7 +7,7 @@ from scipy.stats import ks_2samp
 
 from models import NFSTRegressor, CNN, MSTRegressor
 from bootstrapping import get_bootstrap_score, get_bootstrap_means, get_diffs
-from mocks import create_parity_violating_mocks
+from mocks import create_parity_violating_mocks_2d
 
 model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
 
@@ -44,7 +44,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
     for repeat in range(repeats):
 
         if premade_data is None:
-            train_val_mocks = create_parity_violating_mocks(training_kwargs['num_train_val_mocks'], **mock_kwargs)
+            train_val_mocks = create_parity_violating_mocks_2d(training_kwargs['num_train_val_mocks'], **mock_kwargs)
             train_val_mocks = torch.from_numpy(train_val_mocks).float().unsqueeze(1)
         else:
             train_val_mocks = premade_data
@@ -76,7 +76,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
     # run the best model on the test set and compute the bootstrap scores
 
-    test_mocks = create_parity_violating_mocks(training_kwargs['num_test_mocks'], **mock_kwargs)
+    test_mocks = create_parity_violating_mocks_2d(training_kwargs['num_test_mocks'], **mock_kwargs)
     test_mocks = torch.from_numpy(test_mocks).float().unsqueeze(1)
 
     data_handler = DataHandler(test_mocks)
@@ -105,7 +105,7 @@ def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs,
 
         verification_means = []
         for i in range(num_verification_catalogs):
-            verification_mocks = create_parity_violating_mocks(training_kwargs['num_test_mocks'], **mock_kwargs)
+            verification_mocks = create_parity_violating_mocks_2d(training_kwargs['num_test_mocks'], **mock_kwargs)
             verification_mocks = torch.from_numpy(verification_mocks).float().unsqueeze(1)
             data_handler = DataHandler(verification_mocks)
             verification_loader = data_handler.make_single_dataloader(batch_size=64)
