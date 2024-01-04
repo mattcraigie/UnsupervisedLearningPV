@@ -3,8 +3,8 @@ device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
   output_root: "//pscratch/sd/m/mcraigie/parity/output"  # Directory where the analysis folders will be created
-  model_type: "nfst_mini"  # Type of model to be used
-
+  model_type: "nfst"  # Type of model to be used
+  model_name: "nfst_mini"  # Name of the model to be used
 
   # Model-specific configurations (modify based on the model type)
   model_kwargs:
