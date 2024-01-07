@@ -24,12 +24,12 @@ def batch_difference_loss(model, data):
     return -mu_B / sigma_B
 
 
-def train_and_test_model(model_type, model_kwargs, mock_kwargs, training_kwargs, output_root, repeats=1, premade_data=None, num_verification_catalogs=None, device=None):
+def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, training_kwargs, output_root, repeats=1, premade_data=None, num_verification_catalogs=None, device=None):
 
     try:
         model_class = model_lookup[model_type]
     except KeyError:
-        raise KeyError(f'Unrecognized model type: {model_type}')
+        raise KeyError(f'Unrecognized model type {model_type} for {model_name} analysis')
 
     # make the save dirs for each repeat
     save_dirs = []
