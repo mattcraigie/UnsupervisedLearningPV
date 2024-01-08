@@ -60,7 +60,8 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
         trainer = RegressionTrainer(model, train_loader, val_loader, criterion=batch_difference_loss, no_targets=True, device=device)
         trainer.run_training(epochs=training_kwargs['epochs'], lr=training_kwargs['lr'], print_progress=False, show_loss_plot=False)
 
-        # save the model
+        # save the best model
+        trainer.get_best_model()
         torch.save(model.state_dict(), os.path.join(save_dirs[repeat], 'model.pt'))
 
         # save the loss curves
