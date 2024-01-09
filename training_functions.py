@@ -42,6 +42,8 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
     training_scores = []
 
     for repeat in range(repeats):
+        print(training_kwargs['num_train_val_mocks'])
+        print(mock_kwargs)
 
         if premade_data is None:
             train_val_mocks = create_parity_violating_mocks_2d(training_kwargs['num_train_val_mocks'], **mock_kwargs)
