@@ -20,19 +20,19 @@ analysis_kwargs:
   mock_kwargs:
     field_size: 32
     total_num_triangles: 32
-    ratio_left: [0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]  # Use list of many for sensitivity analysis
+    ratio_left: [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
 
   # Training specific configurations
   training_kwargs:
-    epochs: 100
+    epochs: 500
     lr: 0.0001
     num_train_val_mocks: 5000  # Use list of many for data scaling analysis
     num_test_mocks: 3000
 
 
   # Additional parameters
-  repeats: 1
-  num_verification_catalogs: null
+  repeats: 10
+  num_verification_catalogs: 1000
   premade_data: null
