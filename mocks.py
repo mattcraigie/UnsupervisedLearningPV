@@ -15,18 +15,18 @@ def get_random_orthog_vecs_2d(num_vectors):
     return i, j
 
 
+
 def add_triangle_to_grid(size, a, b, num_triangles):
     grid = np.zeros((size, size), dtype=int)
-    x1, y1 = np.random.random((2, num_triangles)) * size
+    x1, y1 = np.random.randint(0, size, (2, num_triangles))
     point_1 = np.stack([x1, y1], axis=1)
 
     direction_2, direction_3 = get_random_orthog_vecs_2d(num_triangles)
 
-    point_2 = point_1 + (a * direction_2)
-    point_3 = point_1 + (b * direction_3)
+    point_2 = point_1 + (a * direction_2).astype(int)
+    point_3 = point_1 + (b * direction_3).astype(int)
 
     for p in [point_1, point_2, point_3]:
-        p = p.astype(int)
         p = p % size
         np.add.at(grid, tuple(p.T), 1)
 
