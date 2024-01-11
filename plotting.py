@@ -57,11 +57,13 @@ def performance_plot(root, techniques, test_type, plot_type, save_dir, colours=N
         colours = ['red', 'goldenrod', 'blue', 'pink']
 
     for colour, technique in zip(colours, techniques):
+        print(root, test_type, technique)
+        print(os.path.join(root, test_type, technique, csv_name))
         df = pd.read_csv(os.path.join(root, test_type, technique, csv_name))
         ratios = df[key]
 
-        print(root, test_type, technique)
-        print(os.path.join(root, test_type, technique, 'training_scores.npy'))
+
+
 
         scores = np.load(os.path.join(root, test_type, technique, 'training_scores.npy'))
 
