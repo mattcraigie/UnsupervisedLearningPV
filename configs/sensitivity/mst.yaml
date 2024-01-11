@@ -2,7 +2,7 @@ analysis_type: "sensitivity"  # Change to 'data_scaling' as needed
 device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
-  output_root: "//pscratch/sd/m/mcraigie/parity/output"  # Directory where the analysis folders will be created
+  output_root: "//scratch/smp/uqmcrai4/parity/output"  # Directory where the analysis folders will be created
   model_type: "mst"  # Type of model to be used
   model_name: "mst"
 
@@ -17,20 +17,20 @@ analysis_kwargs:
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
-    total_num_triangles: 32
+    total_num_triangles: 16
     ratio_left: [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
 
   # Training specific configurations
   training_kwargs:
-    epochs: 500
+    epochs: 100
     lr: 0.0001
     num_train_val_mocks: 5000  # Use list of many for data scaling analysis
     num_test_mocks: 3000
 
 
   # Additional parameters
-  repeats: 10
-  num_verification_catalogs: 1000
+  repeats: 1
+  num_verification_catalogs: null
   premade_data: null
