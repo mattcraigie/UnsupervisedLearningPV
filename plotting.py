@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import argparse
 
+
 def losses_plot(root, techniques, test_type, save_dir):
     if test_type == 'sensitivity':
         file_start = 'ratio'
@@ -59,9 +60,6 @@ def performance_plot(root, techniques, test_type, plot_type, save_dir, colours=N
     for colour, technique in zip(colours, techniques):
         df = pd.read_csv(os.path.join(root, test_type, technique, csv_name))
         ratios = df[key]
-
-
-
 
         scores = np.load(os.path.join(root, test_type, technique, 'training_scores.npy'))
 

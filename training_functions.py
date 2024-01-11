@@ -4,6 +4,7 @@ import torch
 import numpy as np
 import os
 from scipy.stats import ks_2samp
+import time
 
 from models import NFSTRegressor, CNN, MSTRegressor
 from bootstrapping import get_bootstrap_score, get_bootstrap_means, get_diffs
@@ -24,7 +25,8 @@ def batch_difference_loss(model, data):
     return -mu_B / sigma_B
 
 
-def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, training_kwargs, output_root, repeats=1, premade_data=None, num_verification_catalogs=None, device=None):
+def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, training_kwargs, output_root, repeats=1,
+                         num_verification_catalogs=None, device=None):
 
     try:
         model_class = model_lookup[model_type]
@@ -42,23 +44,19 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
     training_scores = []
 
     for repeat in range(repeats):
-        print(training_kwargs['num_train_val_mocks'])
-        print(mock_kwargs)
+        start = time.time()
 
+        np.random.seed(0)  # mocks are always the same
+        torch.manual_seed(repeat)  # model is different each time, but consistent for the same repeat
 
-        # todo: change this to premade data so it's the same each time.
+        train_val_mocks = create_parity_violating_mocks_2d(training_kwargs['num_train_val_mocks'], **mock_kwargs)
+        train_val_mocks = torch.from_numpy(train_val_mocks).float().unsqueeze(1)
 
-        if premade_data is None:
-            train_val_mocks = create_parity_violating_mocks_2d(training_kwargs['num_train_val_mocks'], **mock_kwargs)
-            train_val_mocks = torch.from_numpy(train_val_mocks).float().unsqueeze(1)
-        else:
-            train_val_mocks = premade_data
-
-
+        # we keep a consistent train and validation set across all repeats
         data_handler = DataHandler(train_val_mocks)
-        train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=0.2)
+        train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, shuffle_split=False,
+                                                                 shuffle_dataloaders=True, val_fraction=0.2)
 
-        torch.manual_seed(repeat)
         model = model_class(**model_kwargs)
         model.to(device)
 
@@ -75,6 +73,7 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
         # get the booststrap score
         bootstrap_score = get_bootstrap_score(model, val_loader)
         training_scores.append(bootstrap_score)
+        print(f'Repeat {repeat} took {time.time() - start:.2f} seconds')
 
     training_scores = np.array(training_scores)
 
