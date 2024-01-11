@@ -146,7 +146,7 @@ if __name__ == '__main__':
     # parse arguments for plotting
     parser = argparse.ArgumentParser()
     parser.add_argument('--plot_func', type=str, default='performance')
-    parser.add_argument('--root', type=str)  # no default, must be supplied
+    parser.add_argument('--root', type=str, required=True)
     parser.add_argument('--techniques', type=str, nargs='+', default=['nfst', 'nfst_mini', 'mst', 'cnn'])
     parser.add_argument('--test_type', type=str, default='sensitivity')
     parser.add_argument('--plot_type', type=str, default='max')
@@ -157,6 +157,8 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
+
+    print(args.root)
 
     if args.plot_func == 'losses':
         losses_plot(args.root, args.techniques, args.test_type, args.save_dir)
