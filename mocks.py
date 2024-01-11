@@ -76,7 +76,6 @@ def make_triangle_mocks(num_mocks, size, a, b, num_triangles):
 def create_parity_violating_mocks_2d(num_mocks, field_size, total_num_triangles, ratio_left, length_side1, length_side2):
     num_left = round(total_num_triangles * ratio_left)
     num_right = round(total_num_triangles * (1 - ratio_left))
-    print(num_left, num_right)
 
     fields_left = make_triangle_mocks(num_mocks, field_size, length_side1, length_side2, num_left)
     fields_right = make_triangle_mocks(num_mocks, field_size, length_side1, -length_side2, num_right)

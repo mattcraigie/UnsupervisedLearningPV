@@ -45,6 +45,9 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
         print(training_kwargs['num_train_val_mocks'])
         print(mock_kwargs)
 
+
+        # todo: change this to premade data so it's the same each time.
+
         if premade_data is None:
             train_val_mocks = create_parity_violating_mocks_2d(training_kwargs['num_train_val_mocks'], **mock_kwargs)
             train_val_mocks = torch.from_numpy(train_val_mocks).float().unsqueeze(1)
