@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import argparse
 
-
-def loss_plot(root, techniques, test_type, save_dir):
+def losses_plot(root, techniques, test_type, save_dir):
     if test_type == 'sensitivity':
         file_start = 'ratio'
     elif test_type == 'data_scaling':
@@ -137,4 +137,30 @@ def verification_plot(root, techniques, test_type, save_dir, colours=None):
 
 
 if __name__ == '__main__':
-    print('Not to be run directly.')
+    # parse arguments for plotting
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--plot_func', type=str, default='performance')
+    parser.add_argument('--root', type=str)  # no default, must be supplied
+    parser.add_argument('--techniques', type=str, nargs='+', default=['nfst', 'nfst_mini', 'mst', 'cnn'])
+    parser.add_argument('--test_type', type=str, default='sensitivity')
+    parser.add_argument('--plot_type', type=str, default='max')
+    parser.add_argument('--save_dir', type=str, default='./output/plots/')
+    parser.add_argument('--colours', type=str, nargs='+', default=None)
+
+    # also for the type of plotting function to call: losses, performance, verification
+
+
+    args = parser.parse_args()
+
+    if args.plot_func == 'losses':
+        losses_plot(args.root, args.techniques, args.test_type, args.save_dir)
+
+    elif args.plot_func == 'performance':
+        performance_plot(args.root, args.techniques, args.test_type, args.plot_type, args.save_dir, args.colours)
+
+    elif args.plot_func == 'verification':
+        verification_plot(args.root, args.techniques, args.test_type, args.save_dir, args.colours)
+
+    # example running:
+
+    # python plotting.py --plot_func performance --root ./output/ --test_type sensitivity --plot_type max --save_dir ./output/plots/
