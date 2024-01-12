@@ -135,7 +135,7 @@ def verification_plot(root, techniques, test_type, save_dir, colours=None):
     axes[0].set_ylabel('KS Test p-value')
     axes[1].set_ylabel('Bootstrap std / Verification std')
 
-    plt.savefig(os.path.join(save_dir, 'verification.png'))
+    plt.savefig(os.path.join(save_dir, test_type + '_verification.png'))
 
 
 if __name__ == '__main__':
