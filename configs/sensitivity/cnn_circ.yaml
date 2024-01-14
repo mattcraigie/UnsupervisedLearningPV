@@ -1,21 +1,20 @@
-analysis_type: "data_scaling"  # Change to 'data_scaling' as needed
+analysis_type: "sensitivity"  # Change to 'data_scaling' as needed
 device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
   output_root: "//scratch/smp/uqmcrai4/parity/output"  # Directory where the analysis folders will be created
   model_type: "cnn"  # Type of model to be used
-  model_name: "cnn"
-
+  model_name: "cnn_circ"
 
   # Model-specific configurations (modify based on the model type)
   model_kwargs:
-    circular: False
+    circular: True
 
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
     total_num_triangles: 16
-    ratio_left: 1.0  # Use list of many for sensitivity analysis
+    ratio_left: [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
 
@@ -23,10 +22,9 @@ analysis_kwargs:
   training_kwargs:
     epochs: 500
     lr: 0.0001
-    num_train_val_mocks: [50, 100, 200, 400, 800, 1600, 3200]  # Use list of many for data scaling analysis
+    num_train_val_mocks: 5000  # Use list of many for data scaling analysis
     num_test_mocks: 3000
 
-
   # Additional parameters
-  repeats: 10
+  repeats: 5
   num_verification_catalogs: 1000

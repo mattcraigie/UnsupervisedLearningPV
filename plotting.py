@@ -62,6 +62,8 @@ def performance_plot(root, techniques, test_type, plot_type, save_dir, colours=N
         ratios = df[key]
 
         scores = np.load(os.path.join(root, test_type, technique, 'training_scores.npy'))
+        if test_type == 'sensitivity':
+            scores = scores[:, :5]  # only take the first 5 repeats
 
         if plot_type == 'max':
             plt.scatter(ratios, scores.max(1), c=colour, label=technique)

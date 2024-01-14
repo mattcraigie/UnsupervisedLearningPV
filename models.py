@@ -86,15 +86,18 @@ class MSTRegressor(nn.Module):
 
 
 class CNN(nn.Module):
-    def __init__(self, dummy_input):
+    def __init__(self, circular=False):
+
+        padding_mode = 'circular' if circular else 'zeros'
+
         super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(1, 100, 11, padding=5)
+        self.conv1 = nn.Conv2d(1, 100, 11, padding=5, padding_mode=padding_mode)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2a = nn.Conv2d(100, 100, 5, padding=2)
-        self.conv2b = nn.Conv2d(100, 100, 5, padding=2)
-        self.conv3a = nn.Conv2d(100, 100, 3, padding=1)
-        self.conv3b = nn.Conv2d(100, 100, 3, padding=1)
-        self.conv3c = nn.Conv2d(100, 100, 3, padding=1)
+        self.conv2a = nn.Conv2d(100, 100, 5, padding=2, padding_mode=padding_mode)
+        self.conv2b = nn.Conv2d(100, 100, 5, padding=2, padding_mode=padding_mode)
+        self.conv3a = nn.Conv2d(100, 100, 3, padding=1, padding_mode=padding_mode)
+        self.conv3b = nn.Conv2d(100, 100, 3, padding=1, padding_mode=padding_mode)
+        self.conv3c = nn.Conv2d(100, 100, 3, padding=1, padding_mode=padding_mode)
         self.fc1 = nn.Linear(6400, 4000)
         self.dropout1 = nn.Dropout(0.5)
         self.fc2 = nn.Linear(4000, 4000)

@@ -8,7 +8,7 @@ analysis_kwargs:
 
   # Model-specific configurations (modify based on the model type)
   model_kwargs:
-    dummy_input: null
+    circular: False
 
   # Mock generation specific configurations
   mock_kwargs:
