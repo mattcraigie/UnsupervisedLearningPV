@@ -31,7 +31,7 @@ def losses_plot(root, techniques, test_type, save_dir):
             repeat_folders = np.sort(repeat_folders)
 
             if test_type == 'sensitivity':
-                repeat_folders = repeat_folders[:, :5]
+                repeat_folders = repeat_folders[:5]
 
             for repeat_folder in repeat_folders:
                 # need to decode utf-8 because this is reading in as byte strings??? not sure why
