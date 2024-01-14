@@ -27,8 +27,13 @@ def losses_plot(root, techniques, test_type, save_dir):
         plt.suptitle(technique + ' losses')
 
         for i, sub_folder in enumerate(sub_folders):
+            repeat_folders = os.listdir(sub_folder)
+            repeat_folders = np.sort(repeat_folders)
 
-            for repeat_folder in os.listdir(sub_folder):
+            if test_type == 'sensitivity':
+                repeat_folders = repeat_folders[:, :5]
+
+            for repeat_folder in repeat_folders:
                 # need to decode utf-8 because this is reading in as byte strings??? not sure why
                 loss_path = os.path.join(sub_folder, repeat_folder.decode("utf-8"), 'losses.npy')
                 losses = np.load(loss_path)
