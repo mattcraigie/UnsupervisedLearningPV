@@ -99,11 +99,22 @@ def random_unit_vector_3d(num_vectors):
     return vec
 
 
-def get_random_orthog_vecs_3d(num_vectors):
-    i = random_unit_vector_3d(num_vectors)
-    j = np.stack([-i[:, 1], i[:, 0], np.zeros(num_vectors)], axis=1)
-    k = np.cross(i, j)
-    return i, j, k
+def get_random_orthog_vecs_3d(num):
+    # Get the first random vectors
+    vector_1 = random_unit_vector_3d(num)
+
+    # Get another set of random vectors that we will use to get an orthogonal second vector
+    intermediate_vecs = random_unit_vector_3d(num)
+
+    # Compute the cross products to get vectors orthogonal to vector_1
+    vector_2 = np.cross(vector_1, intermediate_vecs)
+    vector_2 /= np.linalg.norm(vector_2, axis=1)[:, np.newaxis]  # Normalize vector_2
+
+    # Compute the cross product of v1 and v2 to get the third set of vectors
+    vector_3 = np.cross(vector_1, vector_2)
+    vector_3 /= np.linalg.norm(vector_3, axis=1)[:, np.newaxis]  # Normalize vector_3
+
+    return vector_1, vector_2, vector_3
 
 
 def add_tetrahedron_to_grid(size, a, b, c, num_tetrahedra):
