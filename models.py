@@ -24,7 +24,8 @@ class NFSTRegressor(nn.Module):
                                             init_morlet=init_morlet, full_rotation=True)
         self.filters.update_filters()
 
-        self.initial_filters = copy.deepcopy(self.filters)
+        # get the initial filters state dict
+        self.initial_filters_state = copy.deepcopy(self.filters.state_dict())
 
         self.st = ScatteringTransform2d(self.filters)
         self.reducer = Reducer(self.filters, reduction, filters_3d=False)
