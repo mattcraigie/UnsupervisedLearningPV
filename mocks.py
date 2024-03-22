@@ -86,7 +86,7 @@ def create_parity_violating_mocks_2d(num_mocks, field_size, total_num_triangles,
 def make_mock_dataloaders_2d(num_mocks, val_fraction, field_size, total_num_triangles, ratio_left, length_side1=4, length_side2=8, batch_size=64):
     mocks = create_parity_violating_mocks_2d(num_mocks, field_size, total_num_triangles, ratio_left, length_side1, length_side2)
     data_handler = DataHandler(mocks)
-    train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, val_fraction=val_fraction)
+    train_loader, val_loader = data_handler.make_dataloaders(batch_size=batch_size, val_fraction=val_fraction)
     return train_loader, val_loader
 
 
@@ -119,8 +119,7 @@ def get_random_orthog_vecs_3d(num):
 
 def add_tetrahedron_to_grid(size, a, b, c, num_tetrahedra):
     grid = np.zeros((size, size, size), dtype=int)
-    x1, y1, z1 = np.random.random((3, num_tetrahedra)) * size
-    point_1 = np.stack([x1, y1, z1], axis=1)
+    point_1 = np.random.random((3, num_tetrahedra)) * size
 
     direction_2, direction_3, direction_4 = get_random_orthog_vecs_3d(num_tetrahedra)
 

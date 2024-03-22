@@ -6,6 +6,8 @@ from scattering_transform.scattering_transform import ScatteringTransform2d
 from scattering_transform.filters import FourierSubNetFilters, SubNet, Morlet
 from scattering_transform.reducer import Reducer
 
+import copy
+
 
 class NFSTRegressor(nn.Module):
     def __init__(self, size, num_scales, num_angles=4, subnet_hidden_sizes=(32, 32), init_morlet=True,
@@ -21,6 +23,8 @@ class NFSTRegressor(nn.Module):
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet, symmetric=False,
                                             init_morlet=init_morlet, full_rotation=True)
         self.filters.update_filters()
+
+        self.initial_filters = copy.deepcopy(self.filters)
 
         self.st = ScatteringTransform2d(self.filters)
         self.reducer = Reducer(self.filters, reduction, filters_3d=False)
