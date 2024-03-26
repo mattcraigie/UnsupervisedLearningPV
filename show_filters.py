@@ -5,7 +5,8 @@ from scattering_transform.filters import ClippedMorlet
 from models import NFSTRegressor
 import yaml
 import argparse
-import torch.fft.fftshift as fts
+
+from torch.fft import fftshift as fts
 
 
 def compare_filters(model, save_dir):
