@@ -29,6 +29,7 @@ def compare_filters(model, save_dir):
 
         filt_k1_symm = fts(filt_k1.clone())
         filt_k1_symm[1:] = filt_k1_symm[1:] - filt_k1_symm[1:].flip(0)
+        filt_k1_symm[0, :] = 0
 
         axes[0, j].imshow(fts(filt_k1))
         axes[1, j].imshow(fts(filt_k1 - filt_k0))
@@ -46,7 +47,7 @@ def compare_filters(model, save_dir):
     axes[1, 0].set_ylabel('Difference from \nMorlet Initialisation', fontsize=14)
     axes[2, 0].set_ylabel('Asymmetry in Filter', fontsize=14)
 
-    plt.suptitle('NFST Learned Filters: Fourier Space Magntiudes')
+    plt.suptitle('NFST Learned Filters: Fourier Space Magnitudes')
     plt.savefig(os.path.join(save_dir, 'filters_k.png'))
 
     # figure 2 - Configuration space
@@ -59,11 +60,9 @@ def compare_filters(model, save_dir):
         filt_k1 = filters_initial[j][0].cpu().detach()
         filt_x1 = fts(torch.fft.fft2(filt_k1).abs())
 
-        filt_k1_symm = filt_k1.clone()
-        filt_k1_symm[1:] = filt_k1_symm[1:] - filt_k1_symm[1:].flip(0)
-
         filt_x1_symm = filt_x1.clone()
         filt_x1_symm[1:] = filt_x1_symm[1:] - filt_x1_symm[1:].flip(0)
+        filt_x1_symm[0, :] = 0
 
         axes[0, j].imshow(filt_x1)
         axes[1, j].imshow(filt_x1 - filt_x0)
@@ -81,7 +80,7 @@ def compare_filters(model, save_dir):
     axes[1, 0].set_ylabel('Difference from \nMorlet Initialisation', fontsize=14)
     axes[2, 0].set_ylabel('Asymmetry in Filter', fontsize=14)
 
-    plt.suptitle('NFST Learned Filters: Configuration Space Magntiudes')
+    plt.suptitle('NFST Learned Filters: Configuration Space Magnitudes')
 
     plt.savefig(os.path.join(save_dir, 'filters_x.png'))
 
