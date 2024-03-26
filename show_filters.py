@@ -138,7 +138,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # load config yaml
-    config_path = os.path.join(args.config_path, 'config.yaml')
+    config_path = os.path.join(args.config_path)
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
