@@ -22,7 +22,7 @@ def compare_filters(model, save_dir):
     for j in range(num_scales):
         # plot the final filters, and then the difference between the final and initial filters
         filt_k0 = filters_final[j][0].cpu().detach()
-        filt_k1 = filters_initial[j][0]
+        filt_k1 = filters_initial[j][0].cpu().detach()
 
         filt_k1_symm = filt_k1.clone()
         filt_k1_symm[1:] = filt_k1_symm[1:] - filt_k1_symm[1:].flip(0)
@@ -51,9 +51,9 @@ def compare_filters(model, save_dir):
 
     for j in range(num_scales):
         # plot the final filters, and then the difference between the final and initial filters
-        filt_k0 = filters_final[j][0]
+        filt_k0 = filters_final[j][0].cpu().detach()
         filt_x0 = torch.fft.fft2(filt_k0).abs()
-        filt_k1 = filters_initial[j][0]
+        filt_k1 = filters_initial[j][0].cpu().detach()
         filt_x1 = torch.fft.fft2(filt_k1).abs()
 
         filt_k1_symm = filt_k1.clone()
