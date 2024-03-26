@@ -10,18 +10,18 @@ import argparse
 def compare_filters(model, save_dir):
 
     num_scales = model.filters.num_scales
-    filters_final = model.filters.filters.cpu().detach()
+    filters_final = model.filters.filters
 
     model.filters.load_state_dict(model.initial_filters_state)
     model.filters.update_filters()
-    filters_initial = model.filters.filters.cpu().detach()
+    filters_initial = model.filters.filters
 
     # figure 1 - Fourier space
     fig, axes = plt.subplots(nrows=3, ncols=num_scales, figsize=(9, 9), dpi=100)
 
     for j in range(num_scales):
         # plot the final filters, and then the difference between the final and initial filters
-        filt_k0 = filters_final[j][0]
+        filt_k0 = filters_final[j][0].cpu()
         filt_k1 = filters_initial[j][0]
 
         filt_k1_symm = filt_k1.clone()
