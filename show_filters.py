@@ -21,7 +21,7 @@ def compare_filters(model, save_dir):
 
     for j in range(num_scales):
         # plot the final filters, and then the difference between the final and initial filters
-        filt_k0 = filters_final[j][0].cpu()
+        filt_k0 = filters_final[j][0].cpu().detach()
         filt_k1 = filters_initial[j][0]
 
         filt_k1_symm = filt_k1.clone()
