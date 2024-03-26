@@ -31,6 +31,10 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
         filt_final = transform_fn(filters_final[j][0].cpu().detach())
         filt_initial = transform_fn(filters_initial[j][0].cpu().detach())
 
+        print(filt_final)
+        print(filt_initial)
+        print("")
+
         filt_difference = filt_final - filt_initial
         max_abs_value = max(abs(filt_difference.min()), abs(filt_difference.max()))
         norm_difference = Normalize(vmin=-max_abs_value, vmax=max_abs_value)
