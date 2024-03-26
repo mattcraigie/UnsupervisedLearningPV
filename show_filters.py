@@ -27,12 +27,12 @@ def compare_filters(model, save_dir):
         filt_k0 = filters_final[j][0].cpu().detach()
         filt_k1 = filters_initial[j][0].cpu().detach()
 
-        filt_k1_symm = filt_k1.clone()
+        filt_k1_symm = fts(filt_k1.clone())
         filt_k1_symm[1:] = filt_k1_symm[1:] - filt_k1_symm[1:].flip(0)
 
         axes[0, j].imshow(fts(filt_k1))
         axes[1, j].imshow(fts(filt_k1 - filt_k0))
-        axes[2, j].imshow(fts(filt_k1_symm))
+        axes[2, j].imshow(filt_k1_symm)
 
         for ax in axes.flatten():
             ax.set_xticks([])
