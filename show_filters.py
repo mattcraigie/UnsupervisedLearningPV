@@ -1,7 +1,7 @@
 import os
 import torch
 import matplotlib.pyplot as plt
-from matplotlib.colors import TwoSlopeNorm
+from matplotlib.colors import Normalize
 from scattering_transform.filters import ClippedMorlet
 from models import NFSTRegressor
 import yaml
@@ -32,9 +32,8 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
         filt_initial = transform_fn(filters_initial[j][0].cpu().detach())
 
         filt_difference = filt_final - filt_initial
-        print(filt_difference.min(), filt_difference.max())
-        print(filt_difference)
-        norm_difference = TwoSlopeNorm(vmin=filt_difference.min(), vcenter=0, vmax=filt_difference.max())
+        max_abs_value = max(abs(filt_difference.min()), abs(filt_difference.max()))
+        norm_difference = Normalize(vmin=-max_abs_value, vmax=max_abs_value)
 
         filt_asymmetry = filt_final.clone()
         filt_asymmetry[1:] = filt_asymmetry[1:] - filt_asymmetry[1:].flip(0)
