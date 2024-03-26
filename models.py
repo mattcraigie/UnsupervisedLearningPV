@@ -51,6 +51,15 @@ class NFSTRegressor(nn.Module):
         self.device = device
         return self
 
+    def state_dict(self, destination=None, prefix='', keep_vars=False):
+        state = super(NFSTRegressor, self).state_dict(destination, prefix, keep_vars)
+        state[prefix + 'initial_filters_state'] = self.initial_filters_state
+        return state
+
+    def load_state_dict(self, state_dict, strict=True):
+        self.initial_filters_state = state_dict.pop('initial_filters_state')
+        super(NFSTRegressor, self).load_state_dict(state_dict, strict)
+
 
 class MSTRegressor(nn.Module):
     def __init__(self, size, num_scales, num_angles=4, reduction='asymm_ang_avg', linear_hiddens=128):
