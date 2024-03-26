@@ -1,6 +1,7 @@
 import os
 import torch
 import matplotlib.pyplot as plt
+from matplotlib.colors import TwoSlopeNorm
 from scattering_transform.filters import ClippedMorlet
 from models import NFSTRegressor
 import yaml
@@ -29,13 +30,17 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
     for j in range(num_scales):
         filt_final = transform_fn(filters_final[j][0].cpu().detach())
         filt_initial = transform_fn(filters_initial[j][0].cpu().detach())
-        filt_symm = filt_final.clone()
-        filt_symm[1:] = filt_symm[1:] - filt_symm[1:].flip(0)
-        filt_symm[0, :] = 0
+
+        filt_difference = filt_final - filt_initial
+        norm_difference = TwoSlopeNorm(vmin=filt_difference.min(), vcenter=0, vmax=filt_difference.max())
+
+        filt_asymmetry = filt_final.clone()
+        filt_asymmetry[1:] = filt_asymmetry[1:] - filt_asymmetry[1:].flip(0)
+        filt_asymmetry[0, :] = 0
 
         axes[0, j].imshow(filt_final)
-        axes[1, j].imshow(filt_final - filt_initial)
-        axes[2, j].imshow(filt_symm)
+        axes[1, j].imshow(filt_difference, norm=norm_difference, cmap='coolwarm')
+        axes[2, j].imshow(filt_asymmetry, cmap='coolwarm')
 
         for ax in axes.flatten():
             ax.set_xticks([])
