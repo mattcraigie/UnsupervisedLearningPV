@@ -9,80 +9,87 @@ import argparse
 from torch.fft import fftshift as fts
 
 
-def compare_filters(model, save_dir):
+def plot_filter_transformations(model, save_dir, transform_fn, title, file_name):
+    """
+    Plot filter transformations.
 
+    Parameters:
+    - model: The model containing the filters.
+    - save_dir: Directory to save the plots.
+    - transform_fn: Function to transform the filters.
+    - title: Title for the plots.
+    - file_name: File name to save the plot.
+    """
     num_scales = model.filters.num_scales
-    filters_final = model.filters.filters
-    filters_final = [filt.clone() for filt in filters_final]
-
+    filters_final = [filt.clone() for filt in model.filters.filters]
     model.filters.load_state_dict(model.initial_filters_state)
     model.filters.update_filters()
     filters_initial = model.filters.filters
 
-    # figure 1 - Fourier space
     fig, axes = plt.subplots(nrows=3, ncols=num_scales, figsize=(9, 9), dpi=100)
 
     for j in range(num_scales):
-        # plot the final filters, and then the difference between the final and initial filters
-        filt_k0 = filters_final[j][0].cpu().detach()
-        filt_k1 = filters_initial[j][0].cpu().detach()
+        filt_final = transform_fn(filters_final[j][0].cpu().detach())
+        filt_initial = transform_fn(filters_initial[j][0].cpu().detach())
+        filt_symm = filt_initial.clone()
+        filt_symm[1:] = filt_symm[1:] - filt_symm[1:].flip(0)
+        filt_symm[0, :] = 0
 
-        filt_k1_symm = fts(filt_k1.clone())
-        filt_k1_symm[1:] = filt_k1_symm[1:] - filt_k1_symm[1:].flip(0)
-        filt_k1_symm[0, :] = 0
-
-        axes[0, j].imshow(fts(filt_k1))
-        axes[1, j].imshow(fts(filt_k1 - filt_k0))
-        axes[2, j].imshow(filt_k1_symm)
+        axes[0, j].imshow(filt_initial)
+        axes[1, j].imshow(filt_initial - filt_final)
+        axes[2, j].imshow(filt_symm)
 
         for ax in axes.flatten():
             ax.set_xticks([])
             ax.set_yticks([])
 
-    axes[0, 0].set_title('$j=0$')
-    axes[0, 1].set_title('$j=1$')
-    axes[0, 2].set_title('$j=2$')
-
     axes[0, 0].set_ylabel('Learned Filter', fontsize=14)
     axes[1, 0].set_ylabel('Difference from \nMorlet Initialisation', fontsize=14)
     axes[2, 0].set_ylabel('Asymmetry in Filter', fontsize=14)
 
-    plt.suptitle('NFST Learned Filters: Fourier Space Magnitudes')
-    plt.savefig(os.path.join(save_dir, 'filters_k.png'))
+    for i in range(num_scales):
+        axes[0, i].set_title(f'$j={i}$')
 
-    # figure 2 - Configuration space
-    fig, axes = plt.subplots(nrows=3, ncols=num_scales, figsize=(9, 9), dpi=100)
+    plt.suptitle(title)
+    plt.savefig(os.path.join(save_dir, file_name))
 
-    for j in range(num_scales):
-        # plot the final filters, and then the difference between the final and initial filters
-        filt_k0 = filters_final[j][0].cpu().detach()
-        filt_x0 = fts(torch.fft.fft2(filt_k0).abs())
-        filt_k1 = filters_initial[j][0].cpu().detach()
-        filt_x1 = fts(torch.fft.fft2(filt_k1).abs())
 
-        filt_x1_symm = filt_x1.clone()
-        filt_x1_symm[1:] = filt_x1_symm[1:] - filt_x1_symm[1:].flip(0)
-        filt_x1_symm[0, :] = 0
+def compare_filters(model, save_dir):
+    # Fourier space transformation (no change)
+    def identity_transform(filter_tensor):
+        return filter_tensor
 
-        axes[0, j].imshow(filt_x1)
-        axes[1, j].imshow(filt_x1 - filt_x0)
-        axes[2, j].imshow(filt_x1_symm)
+    # Configuration space magnitude (no change)
+    def fourier_transform(filter_tensor):
+        return torch.fft.fftshift(torch.fft.fft2(filter_tensor).abs())
 
-        for ax in axes.flatten():
-            ax.set_xticks([])
-            ax.set_yticks([])
+    # Configuration space real part
+    def real_transform(filter_tensor):
+        return torch.fft.fftshift(torch.fft.fft2(filter_tensor).real)
 
-    axes[0, 0].set_title('$j=0$')
-    axes[0, 1].set_title('$j=1$')
-    axes[0, 2].set_title('$j=2$')
+    # Configuration space imaginary part
+    def imaginary_transform(filter_tensor):
+        return torch.fft.fftshift(torch.fft.fft2(filter_tensor).imag)
 
-    axes[0, 0].set_ylabel('Learned Filter', fontsize=14)
-    axes[1, 0].set_ylabel('Difference from \nMorlet Initialisation', fontsize=14)
-    axes[2, 0].set_ylabel('Asymmetry in Filter', fontsize=14)
+    # Plot in Fourier space
+    plot_filter_transformations(model, save_dir, identity_transform,
+                                'NFST Learned Filters: Fourier Space Magnitudes',
+                                'filters_k.png')
 
-    plt.suptitle('NFST Learned Filters: Configuration Space Magnitudes')
+    # Plot in Configuration space (Magnitude)
+    plot_filter_transformations(model, save_dir, fourier_transform,
+                                'NFST Learned Filters: Configuration Space Magnitudes',
+                                'filters_x_abs.png')
 
-    plt.savefig(os.path.join(save_dir, 'filters_x.png'))
+    # Plot in Configuration space (Real Part)
+    plot_filter_transformations(model, save_dir, real_transform,
+                                'NFST Learned Filters: Configuration Space Real Part',
+                                'filters_x_real.png')
+
+    # Plot in Configuration space (Imaginary Part)
+    plot_filter_transformations(model, save_dir, imaginary_transform,
+                                'NFST Learned Filters: Configuration Space Imaginary Part',
+                                'filters_x_imag.png')
 
 
 def show_filters(model, save_dir, morlet_diff=False):
