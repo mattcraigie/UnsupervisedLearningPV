@@ -8,7 +8,7 @@ import yaml
 import argparse
 
 
-def plot_filter_transformations(model, save_dir, transform_fn, title, file_name):
+def plot_filter_transformations(filters_final, filters_initial, save_dir, transform_fn, title, file_name):
     """
     Plot filter transformations.
 
@@ -19,11 +19,7 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
     - title: Title for the plots.
     - file_name: File name to save the plot.
     """
-    num_scales = model.filters.num_scales
-    filters_final = [filt.clone() for filt in model.filters.filters]
-    model.filters.load_state_dict(model.initial_filters_state)
-    model.filters.update_filters()
-    filters_initial = model.filters.filters
+    num_scales = len(filters_final)
 
     fig, axes = plt.subplots(nrows=3, ncols=num_scales, figsize=(9, 9), dpi=100)
 
@@ -79,23 +75,28 @@ def compare_filters(model, save_dir):
     def config_imaginary_transform(filter_tensor):
         return torch.fft.fftshift(torch.fft.fft2(filter_tensor).imag)
 
+    filters_final = [filt.clone() for filt in model.filters.filters]
+    model.filters.load_state_dict(model.initial_filters_state)
+    model.filters.update_filters()
+    filters_initial = model.filters.filters
+
     # Plot in Fourier space
-    plot_filter_transformations(model, save_dir, fourier_real_transform,
+    plot_filter_transformations(filters_final, filters_initial, save_dir, fourier_real_transform,
                                 'NFST Learned Filters: Fourier Space Real Part',
                                 'filters_k.png')
 
     # Plot in Configuration space (Magnitude)
-    plot_filter_transformations(model, save_dir, config_abs_transform,
+    plot_filter_transformations(filters_final, filters_initial, save_dir, config_abs_transform,
                                 'NFST Learned Filters: Configuration Space Magnitudes',
                                 'filters_x_abs.png')
 
     # Plot in Configuration space (Real Part)
-    plot_filter_transformations(model, save_dir, config_real_transform,
+    plot_filter_transformations(filters_final, filters_initial, save_dir, config_real_transform,
                                 'NFST Learned Filters: Configuration Space Real Part',
                                 'filters_x_real.png')
 
     # Plot in Configuration space (Imaginary Part)
-    plot_filter_transformations(model, save_dir, config_imaginary_transform,
+    plot_filter_transformations(filters_final, filters_initial, save_dir, config_imaginary_transform,
                                 'NFST Learned Filters: Configuration Space Imaginary Part',
                                 'filters_x_imag.png')
 
