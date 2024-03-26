@@ -32,6 +32,8 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
         filt_initial = transform_fn(filters_initial[j][0].cpu().detach())
 
         filt_difference = filt_final - filt_initial
+        print(filt_difference.min(), filt_difference.max())
+        print(filt_difference)
         norm_difference = TwoSlopeNorm(vmin=filt_difference.min(), vcenter=0, vmax=filt_difference.max())
 
         filt_asymmetry = filt_final.clone()
@@ -39,8 +41,8 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
         filt_asymmetry[0, :] = 0
 
         axes[0, j].imshow(filt_final)
-        axes[1, j].imshow(filt_difference, norm=norm_difference, cmap='coolwarm')
-        axes[2, j].imshow(filt_asymmetry, cmap='coolwarm')
+        axes[1, j].imshow(filt_difference, norm=norm_difference, cmap='bwr')
+        axes[2, j].imshow(filt_asymmetry, cmap='bwr')
 
         for ax in axes.flatten():
             ax.set_xticks([])
