@@ -29,12 +29,12 @@ def plot_filter_transformations(model, save_dir, transform_fn, title, file_name)
     for j in range(num_scales):
         filt_final = transform_fn(filters_final[j][0].cpu().detach())
         filt_initial = transform_fn(filters_initial[j][0].cpu().detach())
-        filt_symm = filt_initial.clone()
+        filt_symm = filt_final.clone()
         filt_symm[1:] = filt_symm[1:] - filt_symm[1:].flip(0)
         filt_symm[0, :] = 0
 
-        axes[0, j].imshow(filt_initial)
-        axes[1, j].imshow(filt_initial - filt_final)
+        axes[0, j].imshow(filt_final)
+        axes[1, j].imshow(filt_final - filt_initial)
         axes[2, j].imshow(filt_symm)
 
         for ax in axes.flatten():
