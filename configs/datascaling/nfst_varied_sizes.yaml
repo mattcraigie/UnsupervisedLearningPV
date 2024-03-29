@@ -1,0 +1,36 @@
+analysis_type: "nfst_sizes"  # Change to 'data_scaling' as needed
+device: "cuda"  # Change to 'cpu' if needed
+
+analysis_kwargs:
+  output_root: "//scratch/smp/uqmcrai4/parity/output"  # Directory where the analysis folders will be created
+  model_type: "nfst"  # Type of model to be used
+  model_name: "nfst"
+
+  # Model-specific configurations (modify based on the model type)
+  model_kwargs:
+    size: 32
+    num_scales: 3
+    num_angles: 4
+    subnet_hidden_sizes: [[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]]
+    reduction: 'asymm_ang_avg'
+    linear_hiddens: 128
+
+  # Mock generation specific configurations
+  mock_kwargs:
+    field_size: 32
+    total_num_triangles: 16
+    ratio_left: 1.0  # Use list of many for sensitivity analysis
+    length_side1: 4
+    length_side2: 8
+
+  # Training specific configurations
+  training_kwargs:
+    epochs: 500
+    lr: 0.0001
+    num_train_val_mocks: [50, 100, 200, 400, 800, 1600, 3200]  # Use list of many for data scaling analysis
+    num_test_mocks: 3000
+
+
+  # Additional parameters
+  repeats: 10
+  num_verification_catalogs: 1000

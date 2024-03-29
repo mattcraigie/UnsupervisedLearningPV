@@ -24,7 +24,7 @@ def pv_detection(config):
 
     analysis_type = config['analysis_type']
 
-    assert analysis_type in ['sensitivity', 'data_scaling'], f"Analysis type {analysis_type} not recognized."
+    assert analysis_type in ['sensitivity', 'data_scaling', 'nfst_size'], f"Analysis type {analysis_type} not recognized."
 
     analysis_config = config['analysis_kwargs']
 
@@ -110,6 +110,33 @@ def pv_detection(config):
 
         np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
 
+    elif analysis_type == 'nfst_size':
+
+        all_training_scores = []
+        all_outputs = []
+
+        nfst_sizes = analysis_config['model_kwargs']['subnet_hidden_size']
+
+        for i in range(len(nfst_sizes)):
+
+            nfst_sizes_folder = os.path.join(model_folder, f'nfst_sizes_{i}')
+            os.makedirs(nfst_sizes_folder, exist_ok=True)
+            analysis_config['output_root'] = nfst_sizes_folder
+
+            analysis_config['model_kwargs']['subnet_hidden_size'] = nfst_sizes[i]
+
+            logging.info(f"Running with {nfst_sizes[i]} hidden size.")
+            training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
+
+            all_training_scores.append(training_scores)
+            all_outputs.append(output_dict)
+
+        # save results to csv
+        df = pd.DataFrame(all_outputs)
+        df['nfst_sizes'] = nfst_sizes[0]
+        df.to_csv(os.path.join(model_folder, 'nfst_sizes.csv'), index=False)
+
+        np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
 
 
     end_time = time.time()
