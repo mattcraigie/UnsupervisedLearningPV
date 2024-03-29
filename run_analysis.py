@@ -115,7 +115,7 @@ def pv_detection(config):
         all_training_scores = []
         all_outputs = []
 
-        nfst_sizes = analysis_config['model_kwargs']['subnet_hidden_size']
+        nfst_sizes = analysis_config['model_kwargs']['subnet_hidden_sizes']
 
         for i in range(len(nfst_sizes)):
 
@@ -123,7 +123,7 @@ def pv_detection(config):
             os.makedirs(nfst_sizes_folder, exist_ok=True)
             analysis_config['output_root'] = nfst_sizes_folder
 
-            analysis_config['model_kwargs']['subnet_hidden_size'] = nfst_sizes[i]
+            analysis_config['model_kwargs']['subnet_hidden_sizes'] = nfst_sizes[i]
 
             logging.info(f"Running with {nfst_sizes[i]} hidden size.")
             training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
