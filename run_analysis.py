@@ -110,7 +110,7 @@ def pv_detection(config):
 
         np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
 
-    elif analysis_type == 'nfst_size':
+    elif analysis_type == 'nfst_sizes':
 
         all_training_scores = []
         all_outputs = []
