@@ -11,7 +11,7 @@ analysis_kwargs:
     size: 32
     num_scales: 3
     num_angles: 4
-    subnet_hidden_sizes: [[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]]
+    subnet_hidden_sizes: [[128, 128], [256, 256], [512, 512], [1024, 1024]]
     reduction: 'asymm_ang_avg'
     linear_hiddens: 128
     init_morlet: false
