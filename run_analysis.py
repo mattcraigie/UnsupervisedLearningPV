@@ -133,7 +133,7 @@ def pv_detection(config):
 
         # save results to csv
         df = pd.DataFrame(all_outputs)
-        df['nfst_sizes'] = nfst_sizes[0]
+        df['nfst_sizes'] = [i[0] for i in nfst_sizes]
         df.to_csv(os.path.join(model_folder, 'nfst_sizes.csv'), index=False)
 
         np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
