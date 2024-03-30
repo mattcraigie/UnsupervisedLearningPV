@@ -33,5 +33,5 @@ analysis_kwargs:
 
 
   # Additional parameters
-  repeats: 10
+  repeats: 1
   num_verification_catalogs: 1000
