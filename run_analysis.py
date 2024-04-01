@@ -87,10 +87,13 @@ def pv_detection(config):
     all_test_scores = np.stack([output['test_scores'] for output in outputs])
     np.save(os.path.join(model_folder, 'test_scores.npy'), all_test_scores)
 
+    # make test score df
+    df_columns = [i[0] for i in variable_features] if analysis_type == 'nfst_sizes' else variable_features
+    test_scores_df = pd.DataFrame(data=all_test_scores, columns=df_columns)
+
     # make summary df with mean, std, min, max, 1st, 2nd and 3rd quartiles of test scores
-    summary_df = pd.DataFrame(all_test_scores).describe().T
-    summary_df[key_2] = [i[0] for i in variable_features]
-    summary_df.to_csv(os.path.join(model_folder, 'test_scores_summary.csv'))
+    summary_df = test_scores_df.describe().T
+    summary_df.to_csv(os.path.join(model_folder, 'summary.csv'))
 
     end_time = time.time()
     logging.info("Analysis took {:.2f} seconds.".format(end_time - start_time))
