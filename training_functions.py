@@ -41,7 +41,15 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
 
     ### ~~~ TRAINING ~~~ ###
 
-    training_scores = []
+    validation_scores = []
+    test_scores = []
+
+    test_mocks = create_parity_violating_mocks_2d(training_kwargs['num_test_mocks'], **mock_kwargs)
+    test_mocks = torch.from_numpy(test_mocks).float().unsqueeze(1)
+
+    test_data_handler = DataHandler(test_mocks)
+
+    test_loader = test_data_handler.make_single_dataloader(batch_size=64)
 
     for repeat in range(repeats):
         start = time.time()
@@ -70,65 +78,55 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
         # save the loss curves
         trainer.save_losses(os.path.join(save_dirs[repeat], 'losses.npy'))
 
-        # get the booststrap score
-        bootstrap_score = get_bootstrap_score(model, val_loader)
-        training_scores.append(bootstrap_score)
+        # get the validation booststrap score
+        val_bootstrap_score = get_bootstrap_score(model, val_loader)
+        validation_scores.append(val_bootstrap_score)
+
+        test_bootstrap_score = get_bootstrap_score(model, test_loader)
+        test_scores.append(test_bootstrap_score)
+
         print(f'Repeat {repeat} took {time.time() - start:.2f} seconds')
 
-    training_scores = np.array(training_scores)
+    validation_scores = np.array(validation_scores)
+    test_scores = np.array(test_scores)
 
-    ### ~~~ TESTING ~~~ ###
-
-    # run the best model on the test set and compute the bootstrap scores
-
-    test_mocks = create_parity_violating_mocks_2d(training_kwargs['num_test_mocks'], **mock_kwargs)
-    test_mocks = torch.from_numpy(test_mocks).float().unsqueeze(1)
-
-    data_handler = DataHandler(test_mocks)
-
-    test_loader = data_handler.make_single_dataloader(batch_size=64)
-
-    best_model = model_class(**model_kwargs)
-    best_model.load_state_dict(torch.load(os.path.join(save_dirs[np.argmax(training_scores)], 'model.pt')))
-    best_model.to(device)
-
-    test_bootstrap_score = get_bootstrap_score(best_model, test_loader)
-
-
-    output_dict = {'bootstrap_score': test_bootstrap_score}
-
+    output_dict = {'val_scores': validation_scores, 'test_scores': test_scores}
 
     ### ~~~ VERIFICATION ~~~ ###
 
-    if num_verification_catalogs is not None:
-        # run the best model on the full many-universe test to verify the bootstrap std matches the std of the many-universe test
+    # if num_verification_catalogs is not None:
+    #     best_model = model_class(**model_kwargs)
+    #     best_model.load_state_dict(torch.load(os.path.join(save_dirs[np.argmax(test_scores)], 'model.pt')))
+    #     best_model.to(device)
+    #
+    #     # run the best model on the full many-universe test to verify the bootstrap std matches the std of the many-universe test
+    #
+    #     bootstrap_means = get_bootstrap_means(best_model, test_loader)
+    #     bootstrap_std = bootstrap_means.std()
+    #     output_dict['bootstrap_std'] = bootstrap_std.item()
+    #
+    #
+    #     verification_means = []
+    #     for i in range(num_verification_catalogs):
+    #         verification_mocks = create_parity_violating_mocks_2d(training_kwargs['num_test_mocks'], **mock_kwargs)
+    #         verification_mocks = torch.from_numpy(verification_mocks).float().unsqueeze(1)
+    #         data_handler = DataHandler(verification_mocks)
+    #         verification_loader = data_handler.make_single_dataloader(batch_size=64)
+    #         verification_means.append(get_diffs(best_model, verification_loader).mean())
+    #
+    #     verification_means = torch.tensor(verification_means)
+    #     verification_std = verification_means.std()
+    #
+    #     output_dict['verification_std'] = verification_std.item()
+    #
+    #     # 2 sample KS test
+    #     bootstrap_means = bootstrap_means.numpy().squeeze(1)
+    #     verification_means = verification_means.numpy()
+    #
+    #     shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
+    #     shifted_verification_means = verification_means - verification_means.mean()
+    #
+    #     output_dict['ks_test_pvalue'] = ks_2samp(shifted_bootstrap_means, shifted_verification_means).pvalue
 
-        bootstrap_means = get_bootstrap_means(best_model, test_loader)
-        bootstrap_std = bootstrap_means.std()
-        output_dict['bootstrap_std'] = bootstrap_std.item()
-
-
-        verification_means = []
-        for i in range(num_verification_catalogs):
-            verification_mocks = create_parity_violating_mocks_2d(training_kwargs['num_test_mocks'], **mock_kwargs)
-            verification_mocks = torch.from_numpy(verification_mocks).float().unsqueeze(1)
-            data_handler = DataHandler(verification_mocks)
-            verification_loader = data_handler.make_single_dataloader(batch_size=64)
-            verification_means.append(get_diffs(best_model, verification_loader).mean())
-
-        verification_means = torch.tensor(verification_means)
-        verification_std = verification_means.std()
-
-        output_dict['verification_std'] = verification_std.item()
-
-        # 2 sample KS test
-        bootstrap_means = bootstrap_means.numpy().squeeze(1)
-        verification_means = verification_means.numpy()
-
-        shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
-        shifted_verification_means = verification_means - verification_means.mean()
-
-        output_dict['ks_test_pvalue'] = ks_2samp(shifted_bootstrap_means, shifted_verification_means).pvalue
-
-    return training_scores, output_dict
+    return output_dict
 

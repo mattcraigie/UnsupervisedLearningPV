@@ -40,7 +40,6 @@ def pv_detection(config):
 
     logging_filename = os.path.join(model_folder, f'{analysis_type}.log')
 
-
     if os.path.exists(logging_filename):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         logging_filename = os.path.join(model_folder, f'{analysis_type}_{timestamp}.log')
@@ -48,96 +47,50 @@ def pv_detection(config):
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
     logging.info(f"Running on {device}.")
 
-
     start_time = time.time()
 
     logging.info("Running analysis.")
 
-    if analysis_type == 'sensitivity':
-
-        all_training_scores = []
-        all_outputs = []
-
-        ratios = analysis_config['mock_kwargs']['ratio_left']
-
-        for i in range(len(ratios)):
-
-            ratio_folder = os.path.join(model_folder, f'ratio_{i}')
-            os.makedirs(ratio_folder, exist_ok=True)
-            analysis_config['output_root'] = ratio_folder
-
-            analysis_config['mock_kwargs']['ratio_left'] = ratios[i]
-
-            logging.info(f"Running with balance {ratios[i]}")
-
-            training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
-
-            all_training_scores.append(training_scores)
-            all_outputs.append(output_dict)
-
-        # save results to csv
-        df = pd.DataFrame(all_outputs)
-        df['ratio_left'] = ratios
-        df.to_csv(os.path.join(model_folder, 'sensitivity.csv'), index=False)
-
-        np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
-
-    elif analysis_type == 'data_scaling':
-
-        all_training_scores = []
-        all_outputs = []
-
-        data_sizes = analysis_config['training_kwargs']['num_train_val_mocks']
-
-        for i in range(len(data_sizes)):
-
-            datascaling_folder = os.path.join(model_folder, f'datascaling_{i}')
-            os.makedirs(datascaling_folder, exist_ok=True)
-            analysis_config['output_root'] = datascaling_folder
-
-            analysis_config['training_kwargs']['num_train_val_mocks'] = data_sizes[i]
-
-            logging.info(f"Running with {data_sizes[i]} training and validation mocks")
-            training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
-
-            all_training_scores.append(training_scores)
-            all_outputs.append(output_dict)
-
-        # save results to csv
-        df = pd.DataFrame(all_outputs)
-        df['num_train_val_mocks'] = data_sizes
-        df.to_csv(os.path.join(model_folder, 'data_scaling.csv'), index=False)
-
-        np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
-
+    if analysis_type == 'data_scaling':
+        key_1 = 'training_kwargs'
+        key_2 = 'num_train_val_mocks'
     elif analysis_type == 'nfst_sizes':
+        key_1 = 'model_kwargs'
+        key_2 = 'subnet_hidden_sizes'
+    elif analysis_type == 'sensitivity':
+        key_1 = 'mock_kwargs'
+        key_2 = 'ratio_left'
+    else:
+        raise ValueError(f"Analysis type {analysis_type} not recognized.")
 
-        all_training_scores = []
-        all_outputs = []
+    variable_features = analysis_config[key_1][key_2]
 
-        nfst_sizes = analysis_config['model_kwargs']['subnet_hidden_sizes']
+    outputs = []
+    for i in range(len(variable_features)):
 
-        for i in range(len(nfst_sizes)):
+        analysis_folder = os.path.join(model_folder, f'{analysis_type}_{i}')
+        os.makedirs(analysis_folder, exist_ok=True)
+        analysis_config['output_root'] = analysis_folder
 
-            nfst_sizes_folder = os.path.join(model_folder, f'nfst_sizes_{i}')
-            os.makedirs(nfst_sizes_folder, exist_ok=True)
-            analysis_config['output_root'] = nfst_sizes_folder
+        analysis_config[key_1][key_2] = variable_features[i]
 
-            analysis_config['model_kwargs']['subnet_hidden_sizes'] = nfst_sizes[i]
+        logging.info(f"Running with {key_2}={variable_features[i]}")
+        output_dict = train_and_test_model(**analysis_config, device=device)
 
-            logging.info(f"Running with {nfst_sizes[i]} hidden size.")
-            training_scores, output_dict = train_and_test_model(**analysis_config, device=device)
+        outputs.append(output_dict)
 
-            all_training_scores.append(training_scores)
-            all_outputs.append(output_dict)
+    # save results to csv
+    all_val_scores = np.stack([output['val_scores'] for output in outputs])
+    np.save(os.path.join(model_folder, 'val_scores.npy'), all_val_scores)
 
-        # save results to csv
-        df = pd.DataFrame(all_outputs)
-        df['nfst_sizes'] = [i[0] for i in nfst_sizes]
-        df.to_csv(os.path.join(model_folder, 'nfst_sizes.csv'), index=False)
+    # same for test scores
+    all_test_scores = np.stack([output['test_scores'] for output in outputs])
+    np.save(os.path.join(model_folder, 'test_scores.npy'), all_test_scores)
 
-        np.save(os.path.join(model_folder, 'training_scores.npy'), np.stack(all_training_scores))
-
+    # make summary df with mean, std, min, max, 1st, 2nd and 3rd quartiles of test scores
+    summary_df = pd.DataFrame(all_test_scores).describe().T
+    summary_df[key_2] = [i[0] for i in variable_features]
+    summary_df.to_csv(os.path.join(model_folder, 'test_scores_summary.csv'))
 
     end_time = time.time()
     logging.info("Analysis took {:.2f} seconds.".format(end_time - start_time))

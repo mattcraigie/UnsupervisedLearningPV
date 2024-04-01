@@ -57,7 +57,7 @@ def performance_plot(root, techniques, test_type, plot_type, save_dir, colours=N
     assert test_type in ['sensitivity', 'data_scaling'], 'test_type must be one of "sensitivity" or "datascaling"'
 
     key = 'ratio_left' if test_type == 'sensitivity' else 'num_train_val_mocks'
-    csv_name = 'sensitivity.csv' if test_type == 'sensitivity' else 'data_scaling.csv'
+    csv_name = test_type + '.csv'
 
     if colours is None:
         colours = ['red', 'goldenrod', 'blue', 'pink']
