@@ -64,6 +64,7 @@ def pv_detection(config):
         raise ValueError(f"Analysis type {analysis_type} not recognized.")
 
     variable_features = analysis_config[key_1][key_2]
+    print(variable_features)
 
     outputs = []
     for i in range(len(variable_features)):
@@ -87,9 +88,13 @@ def pv_detection(config):
     all_test_scores = np.stack([output['test_scores'] for output in outputs])
     np.save(os.path.join(model_folder, 'test_scores.npy'), all_test_scores)
 
+    print(all_test_scores.shape)
+
     # make test score df
     df_columns = [i[0] for i in variable_features] if analysis_type == 'nfst_sizes' else variable_features
+    print(df_columns.shape)
     test_scores_df = pd.DataFrame(data=all_test_scores, columns=df_columns)
+    print(test_scores_df)
 
     # make summary df with mean, std, min, max, 1st, 2nd and 3rd quartiles of test scores
     summary_df = test_scores_df.describe().T
