@@ -64,7 +64,6 @@ def pv_detection(config):
         raise ValueError(f"Analysis type {analysis_type} not recognized.")
 
     variable_features = analysis_config[key_1][key_2]
-    print(variable_features)
 
     outputs = []
     for i in range(len(variable_features)):
