@@ -52,46 +52,63 @@ def losses_plot(root, techniques, test_type, save_dir):
         plt.savefig(os.path.join(save_dir, test_type + '_' + technique + '_losses.png'))
 
 
-def performance_plot(root, techniques, test_type, plot_type, save_dir, colours=None):
-    assert plot_type in ['max', 'mean', 'all'], 'type must be one of "max", "mean", or "all"'
-    assert test_type in ['sensitivity', 'data_scaling'], 'test_type must be one of "sensitivity" or "datascaling"'
 
-    key = 'ratio_left' if test_type == 'sensitivity' else 'num_train_val_mocks'
-    csv_name = test_type + '.csv'
+def plot_data_from_csvs(csv_paths, labels, value='mean'):
+    """
+    Plots the specified values directly from multiple CSV files against their index columns.
 
-    if colours is None:
-        colours = ['red', 'goldenrod', 'blue', 'pink']
+    Parameters:
+    - csv_paths: List of paths to the CSV files.
+    - labels: List of labels corresponding to each CSV file for the plot legend.
+    - value: 'mean' to plot mean with std error bars, or 'median' to plot median with 25-75% intervals.
+    """
+    if len(csv_paths) != len(labels):
+        raise ValueError("The number of CSV paths must match the number of labels.")
 
-    for colour, technique in zip(colours, techniques):
-        df = pd.read_csv(os.path.join(root, test_type, technique, csv_name))
-        ratios = df[key]
+    colours = ['red', 'goldenrod', 'blue', 'pink']
 
-        scores = np.load(os.path.join(root, test_type, technique, 'training_scores.npy'))
-        if test_type == 'sensitivity':
-            scores = scores[:, :5]  # only take the first 5 repeats
+    for csv_path, label, colour in zip(csv_paths, labels, colours):
+        # Read the CSV into a DataFrame
+        df = pd.read_csv(csv_path)
 
-        if plot_type == 'max':
-            plt.scatter(ratios, scores.max(1), c=colour, label=technique)
-        elif plot_type == 'mean':
-            plt.scatter(ratios, scores.mean(1), c=colour, label=technique)
-        elif plot_type == 'all':
-            for i in range(scores.shape[1]):
-                if i == 0:
-                    plt.scatter(ratios, scores[:, i], c=colour, label=technique)
-                else:
-                    plt.scatter(ratios, scores[:, i], c=colour)
+        # Assuming the first unnamed column represents sample sizes and is used as the x-axis
+        x = df.iloc[:, 0]
 
-        plt.axhline(3, c='black', linestyle=':')
+        if value == 'mean':
+            y = df['mean']
+            error = df['std']
+            plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, label=f'{label} Mean ± STD')
+            plt.plot(x, y, '-o', label=f'{label} Mean', color=colour)
+            plt.fill_between(x, y - error, y + error, alpha=0.1, color=colour)
+        elif value == 'median':
+            y = df['50%']  # Median
+            lower_error = y - df['25%']
+            upper_error = df['75%'] - y
+            plt.errorbar(x, y, yerr=[lower_error, upper_error], fmt='-o', capsize=5,
+                         label=f'{label} Median with 25-75% interval', color=colour)
+            plt.fill_between(x, df['25%'], df['75%'], alpha=0.1, color=colour)
+            plt.plot(x, y, '-o', label=f'{label} Median', color=colour)
+        else:
+            raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
+
+    # Plotting details
+    plt.xlabel('Index')
+    plt.ylabel(value.capitalize())
+    plt.title(f'{value.capitalize()} Across Different CSVs')
     plt.legend()
+    plt.grid(True)
+    plt.show()
 
-    if test_type == 'sensitivity':
-        plt.xlabel('Ratio of Training to Test Data')
-    elif test_type == 'data_scaling':
-        plt.xlabel('Number of Samples in Train/Val Set')
-        plt.semilogx()
-    plt.ylabel('Test Score ($\eta$)')
 
-    plt.savefig(os.path.join(save_dir, plot_type + '_' + test_type + '_performance.png'))
+# Example usage
+csv_paths = ['path/to/your/csv1.csv', 'path/to/your/csv2.csv']  # Replace with your actual file paths
+labels = ['Dataset 1', 'Dataset 2']  # Labels for each CSV
+plot_data_from_csvs(csv_paths, labels, value='mean')  # Plot mean with std error bars for each dataset
+
+
+# plot_data_from_csvs(csv_paths, labels, value='median')  # Plot median with 25-75% intervals for each dataset
+
+
 
 
 def verification_plot(root, techniques, test_type, save_dir, colours=None):

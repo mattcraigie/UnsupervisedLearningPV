@@ -18,7 +18,7 @@ class NFSTRegressor(nn.Module):
         self.num_scales = num_scales
         self.num_angles = num_angles
 
-        self.subnet = SubNet(num_ins=3, hidden_sizes=subnet_hidden_sizes, num_outs=1, activation=nn.LeakyReLU)
+        self.subnet = SubNet(num_ins=3, hidden_sizes=subnet_hidden_sizes, num_outs=1, hidden_activation=nn.LeakyReLU)
 
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet, symmetric=False,
                                             init_morlet=init_morlet, full_rotation=True)
