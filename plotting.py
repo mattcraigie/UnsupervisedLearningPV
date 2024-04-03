@@ -8,7 +8,7 @@ import argparse
 def losses_plot(root, techniques, test_type, save_dir):
 
     for technique in techniques:
-        technique_dir = os.path.join(root, test_type, technique)
+        technique_dir = os.path.join(root, technique)
 
         sub_folders = []
         for filename in os.listdir(technique_dir):
