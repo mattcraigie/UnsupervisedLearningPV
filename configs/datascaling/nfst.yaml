@@ -11,14 +11,14 @@ analysis_kwargs:
     size: 32
     num_scales: 3
     num_angles: 4
-    subnet_hidden_sizes: [32, 32]
+    subnet_hidden_sizes: [128, 128]
     reduction: 'asymm_ang_avg'
     linear_hiddens: 128
 
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
-    total_num_triangles: 32
+    total_num_triangles: 16
     ratio_left: 1.0  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
