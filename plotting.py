@@ -52,8 +52,7 @@ def losses_plot(root, techniques, test_type, save_dir):
         plt.savefig(os.path.join(save_dir, test_type + '_' + technique + '_losses.png'))
 
 
-
-def plot_data_from_csvs(csv_paths, labels, value='mean'):
+def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
     """
     Plots the specified values directly from multiple CSV files against their index columns.
 
@@ -88,6 +87,10 @@ def plot_data_from_csvs(csv_paths, labels, value='mean'):
                          label=f'{label} Median with 25-75% interval', color=colour)
             plt.fill_between(x, df['25%'], df['75%'], alpha=0.1, color=colour)
             plt.plot(x, y, '-o', label=f'{label} Median', color=colour)
+        elif value == 'max':
+            y = df['max']
+            plt.plot(x, y, '-o', label=f'{label} Max', color=colour)
+
         else:
             raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
 
@@ -97,18 +100,41 @@ def plot_data_from_csvs(csv_paths, labels, value='mean'):
     plt.title(f'{value.capitalize()} Across Different CSVs')
     plt.legend()
     plt.grid(True)
-    plt.show()
+    plt.savefig(f'{plot_name}_{value}.png')
 
 
-# Example usage
-csv_paths = ['path/to/your/csv1.csv', 'path/to/your/csv2.csv']  # Replace with your actual file paths
-labels = ['Dataset 1', 'Dataset 2']  # Labels for each CSV
-plot_data_from_csvs(csv_paths, labels, value='mean')  # Plot mean with std error bars for each dataset
+def datascaling_plot():
+    root = "//scratch/smp/uqmcrai4/parity/output/data_scaling"
+
+    folders = ['nfst', 'mst', 'cnn_circ']
+
+    all_csvs = []
+    for folder in folders:
+        all_csvs.append(os.path.join(root, folder, 'summary.csv'))
+
+    labels = ['NFST', 'WST', 'CNN']
+    save_path = 'plots/data_scaling'
+
+    plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
+    plot_data_from_csvs(all_csvs, labels, save_path, value='median')
+    plot_data_from_csvs(all_csvs, labels, save_path, value='max')
 
 
-# plot_data_from_csvs(csv_paths, labels, value='median')  # Plot median with 25-75% intervals for each dataset
+def nfst_sizes_plot():
+    root = "//scratch/smp/uqmcrai4/parity/output/nfst_sizes"
 
+    folders = ['nfst', 'nfst_noinit']
 
+    all_csvs = []
+    for folder in folders:
+        all_csvs.append(os.path.join(root, folder, 'summary.csv'))
+
+    labels = ['NFST - Morlet Init.', 'NFST - Random Init.']
+    save_path = 'plots/nfst_sizes'
+
+    plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
+    plot_data_from_csvs(all_csvs, labels, save_path, value='median')
+    plot_data_from_csvs(all_csvs, labels, save_path, value='max')
 
 
 def verification_plot(root, techniques, test_type, save_dir, colours=None):
@@ -163,30 +189,34 @@ def verification_plot(root, techniques, test_type, save_dir, colours=None):
 
 
 if __name__ == '__main__':
-    # parse arguments for plotting
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--plot_func', type=str, default='performance')
-    parser.add_argument('--root', type=str, required=True)
-    parser.add_argument('--techniques', type=str, nargs='+', default=['nfst', 'nfst_mini', 'mst', 'cnn'])
-    parser.add_argument('--test_type', type=str, default='sensitivity')
-    parser.add_argument('--plot_type', type=str, default='max')
-    parser.add_argument('--save_dir', type=str, default='./output/plots/')
-    parser.add_argument('--colours', type=str, nargs='+', default=None)
 
-    # also for the type of plotting function to call: losses, performance, verification
+    datascaling_plot()
+    nfst_sizes_plot()
 
-
-    args = parser.parse_args()
-
-    if args.plot_func == 'losses':
-        losses_plot(args.root, args.techniques, args.test_type, args.save_dir)
-
-    elif args.plot_func == 'performance':
-        performance_plot(args.root, args.techniques, args.test_type, args.plot_type, args.save_dir, args.colours)
-
-    elif args.plot_func == 'verification':
-        verification_plot(args.root, args.techniques, args.test_type, args.save_dir, args.colours)
-
-    # example running:
-
-    # python plotting.py --plot_func performance --root ./output/ --test_type sensitivity --plot_type max --save_dir ./output/plots/
+    # # parse arguments for plotting
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--plot_func', type=str, default='performance')
+    # parser.add_argument('--root', type=str, required=True)
+    # parser.add_argument('--techniques', type=str, nargs='+', default=['nfst', 'nfst_mini', 'mst', 'cnn'])
+    # parser.add_argument('--test_type', type=str, default='sensitivity')
+    # parser.add_argument('--plot_type', type=str, default='max')
+    # parser.add_argument('--save_dir', type=str, default='./output/plots/')
+    # parser.add_argument('--colours', type=str, nargs='+', default=None)
+    #
+    # # also for the type of plotting function to call: losses, performance, verification
+    #
+    #
+    # args = parser.parse_args()
+    #
+    # if args.plot_func == 'losses':
+    #     losses_plot(args.root, args.techniques, args.test_type, args.save_dir)
+    #
+    # elif args.plot_func == 'performance':
+    #     performance_plot(args.root, args.techniques, args.test_type, args.plot_type, args.save_dir, args.colours)
+    #
+    # elif args.plot_func == 'verification':
+    #     verification_plot(args.root, args.techniques, args.test_type, args.save_dir, args.colours)
+    #
+    # # example running:
+    #
+    # # python plotting.py --plot_func performance --root ./output/ --test_type sensitivity --plot_type max --save_dir ./output/plots/
