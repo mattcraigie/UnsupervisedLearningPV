@@ -30,8 +30,8 @@ def losses_plot(root, techniques, test_type, save_dir):
                 # need to decode utf-8 because this is reading in as byte strings??? not sure why
                 loss_path = os.path.join(sub_folder, repeat_folder.decode("utf-8"), 'losses.npy')
                 losses = np.load(loss_path)
-                axes[0, i].plot(losses[0], c='blue')
-                axes[1, i].plot(losses[1], c='red')
+                axes[0, i].plot(losses[0], c='blue', alpha=0.3, linewidth=0.5)
+                axes[1, i].plot(losses[1], c='red', alpha=0.3, linewidth=0.5)
                 # axes[i].set_xticks([])
 
                 # break
