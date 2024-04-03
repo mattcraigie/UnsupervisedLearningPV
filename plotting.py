@@ -64,6 +64,8 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
     if len(csv_paths) != len(labels):
         raise ValueError("The number of CSV paths must match the number of labels.")
 
+    plt.figure(figsize=(10, 6))
+
     colours = ['red', 'goldenrod', 'blue', 'pink']
 
     for csv_path, label, colour in zip(csv_paths, labels, colours):
@@ -95,7 +97,7 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
             raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
 
     # Plotting details
-    plt.figure(figsize=(10, 6))
+
     plt.xlabel('Index')
     plt.ylabel(value.capitalize())
     plt.title(f'{value.capitalize()} Across Different CSVs')
