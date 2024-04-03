@@ -6,10 +6,6 @@ import argparse
 
 
 def losses_plot(root, techniques, test_type, save_dir):
-    if test_type == 'sensitivity':
-        file_start = 'ratio'
-    elif test_type == 'data_scaling':
-        file_start = 'datascaling'
 
     for technique in techniques:
         technique_dir = os.path.join(root, test_type, technique)
@@ -17,7 +13,7 @@ def losses_plot(root, techniques, test_type, save_dir):
         sub_folders = []
         for filename in os.listdir(technique_dir):
             full_path = os.path.join(technique_dir, filename)  # Concatenating the directory and filename
-            if os.path.isdir(full_path) and filename.startswith(file_start):
+            if os.path.isdir(full_path) and filename.startswith(test_type):
                 sub_folders.append(full_path)
 
         sub_folders = np.sort(sub_folders)
@@ -29,9 +25,6 @@ def losses_plot(root, techniques, test_type, save_dir):
         for i, sub_folder in enumerate(sub_folders):
             repeat_folders = os.listdir(sub_folder)
             repeat_folders = np.sort(repeat_folders)
-
-            if test_type == 'sensitivity':
-                repeat_folders = repeat_folders[:5]
 
             for repeat_folder in repeat_folders:
                 # need to decode utf-8 because this is reading in as byte strings??? not sure why
@@ -130,6 +123,9 @@ def datascaling_plot():
     plot_data_from_csvs(all_csvs, labels, save_path, value='median')
     plot_data_from_csvs(all_csvs, labels, save_path, value='max')
 
+    save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/'
+    losses_plot(root, folders, 'data_scaling', save_path)
+
 
 def nfst_sizes_plot():
     root = "//scratch/smp/uqmcrai4/parity/output/nfst_sizes"
@@ -146,6 +142,10 @@ def nfst_sizes_plot():
     plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
     plot_data_from_csvs(all_csvs, labels, save_path, value='median')
     plot_data_from_csvs(all_csvs, labels, save_path, value='max')
+
+    save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/'
+    losses_plot(root, folders, 'nfst_sizes', save_path)
+
 
 
 def verification_plot(root, techniques, test_type, save_dir, colours=None):
