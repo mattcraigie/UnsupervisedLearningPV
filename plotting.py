@@ -101,6 +101,7 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
     plt.title(f'{value.capitalize()} Across Different CSVs')
     plt.legend()
     plt.grid(True)
+    plt.semilogx()
     plt.savefig(f'{plot_name}_{value}.png')
 
 
