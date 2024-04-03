@@ -77,19 +77,19 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
             y = df['mean']
             error = df['std']
             plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, label=f'{label} Mean ± STD')
-            plt.plot(x, y, '-o', label=f'{label} Mean', color=colour)
+            plt.plot(x, y, '-o', label=f'{label}', color=colour)
             plt.fill_between(x, y - error, y + error, alpha=0.1, color=colour)
         elif value == 'median':
             y = df['50%']  # Median
             lower_error = y - df['25%']
             upper_error = df['75%'] - y
             plt.errorbar(x, y, yerr=[lower_error, upper_error], fmt='-o', capsize=5,
-                         label=f'{label} Median with 25-75% interval', color=colour)
+                         label=f'{label}', color=colour)
             plt.fill_between(x, df['25%'], df['75%'], alpha=0.1, color=colour)
-            plt.plot(x, y, '-o', label=f'{label} Median', color=colour)
+            plt.plot(x, y, '-o', label=f'{label}', color=colour)
         elif value == 'max':
             y = df['max']
-            plt.plot(x, y, '-o', label=f'{label} Max', color=colour)
+            plt.plot(x, y, '-o', label=f'{label}', color=colour)
 
         else:
             raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
