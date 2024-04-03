@@ -95,6 +95,7 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
             raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
 
     # Plotting details
+    plt.figure(figsize=(10, 6))
     plt.xlabel('Index')
     plt.ylabel(value.capitalize())
     plt.title(f'{value.capitalize()} Across Different CSVs')
