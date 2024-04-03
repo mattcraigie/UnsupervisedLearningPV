@@ -113,7 +113,7 @@ def datascaling_plot():
         all_csvs.append(os.path.join(root, folder, 'summary.csv'))
 
     labels = ['NFST', 'WST', 'CNN']
-    save_path = 'plots/data_scaling'
+    save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/data_scaling'
 
     plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
     plot_data_from_csvs(all_csvs, labels, save_path, value='median')
@@ -130,7 +130,7 @@ def nfst_sizes_plot():
         all_csvs.append(os.path.join(root, folder, 'summary.csv'))
 
     labels = ['NFST - Morlet Init.', 'NFST - Random Init.']
-    save_path = 'plots/nfst_sizes'
+    save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/nfst_sizes'
 
     plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
     plot_data_from_csvs(all_csvs, labels, save_path, value='median')
