@@ -78,7 +78,7 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
         if value == 'mean':
             y = df['mean']
             error = df['std']
-            plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, label=f'{label} Mean ± STD')
+            plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, color=colour)
             plt.plot(x, y, '-o', label=f'{label}', color=colour)
             plt.fill_between(x, y - error, y + error, alpha=0.1, color=colour)
         elif value == 'median':
@@ -104,6 +104,13 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
     plt.legend()
     plt.grid(True)
     plt.semilogx()
+
+    # a black line at y=3
+    plt.axhline(y=3, color='black', linestyle='--')
+
+    # change the y axis so that it's linear from 0 to 10, then log from 10 to 50
+    plt.yscale('symlog', linthresh=10)
+
     plt.savefig(f'{plot_name}_{value}.png')
 
 
