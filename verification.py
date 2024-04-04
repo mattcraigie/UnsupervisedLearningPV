@@ -113,7 +113,10 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
     print("Cosmic variance std: {:.3e}".format(all_universe_means.std().item()))
 
     # check that these means come from the same distribution with a K-S test
-    ks_stat, p_val = stats.ks_2samp(bootstrap_means.squeeze(1).numpy(), all_universe_means.numpy())
+    shifted_bootstrap_means = (bootstrap_means - bootstrap_means.mean()).squeeze(1).numpy()
+    shifted_all_universe_means = (all_universe_means - all_universe_means.mean()).numpy()
+
+    ks_stat, p_val = stats.ks_2samp(shifted_bootstrap_means, shifted_all_universe_means)
     print("K-S test statistic: {:.3e}".format(ks_stat))
     print("K-S test p-value: {:.3e}".format(p_val))
     print("")
