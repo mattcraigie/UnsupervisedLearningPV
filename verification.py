@@ -189,5 +189,5 @@ if __name__ == '__main__':
     # Run the cosmic variance test
     cosmic_variance_test(model, args.num_patches, args.num_universes,
                          hist_save_path=os.path.join(args.save_dir, "cosmic_variance_test.png"),
-                         results_save_path=os.path.join(args.save_dir, "cosmic_variance_test_results.txt")
+                         results_save_path=os.path.join(args.save_dir, "cosmic_variance_test_results.txt"))
 
