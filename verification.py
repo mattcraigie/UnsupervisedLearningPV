@@ -119,8 +119,8 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
     if hist_save_path is not None:
         # plot the two distributions, only showing the top of the histograms
         fig = plt.figure()
-        plt.hist(bootstrap_means, bins=100, alpha=0.5, label="\mu^*")
-        plt.hist(all_universe_means, bins=100, alpha=0.5, label="$\\mu^\\star$")
+        plt.hist(bootstrap_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
+        plt.hist(all_universe_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^\\star$")
         plt.xlabel("Means after Bootstrapping")
         plt.ylabel("Frequency")
         plt.title("Bootstrap vs. Cosmic Variance Means")
