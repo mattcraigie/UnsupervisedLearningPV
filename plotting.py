@@ -211,7 +211,7 @@ def plot_toy_data_patches():
 
     fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
     for i, ax in enumerate(axes):
-        ax.imshow(mocks[i], cmap='Greys', vmax=2)
+        ax.imshow(mocks[i], cmap='Greys', vmax=1, alpha=0.7)
 
         # Convert single mock data to an RGBA image
         rgba_single = np.zeros((*single_blue[i].shape, 4))
