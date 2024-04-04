@@ -205,15 +205,61 @@ def verification_plot(root, techniques, test_type, save_dir, colours=None):
 
 
 def plot_toy_data_patches():
-    mocks = create_parity_violating_mocks_2d(3, 32, 16, 1, 4, 8)
+    mocks = create_parity_violating_mocks_2d(3, 32, 15, 1, 4, 8)
+    single_blue = create_parity_violating_mocks_2d(3, 32, 1, 1, 4, 8)
+    # single_red = create_parity_violating_mocks_2d(3, 32, 1, 1, 4, 8)
+
     fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
     for i, ax in enumerate(axes):
         ax.imshow(mocks[i], cmap='Greys', vmax=2)
+
+        # Convert single mock data to an RGBA image
+        rgba_single = np.zeros((*single_blue[i].shape, 4))
+        rgba_single[..., 2] = single_blue[i]  # Set blue channel
+        rgba_single[..., 3] = single_blue[i]  # Set alpha channel based on the data value
+
+        # Overplot the single in blue with variable opacity
+        ax.imshow(rgba_single, vmax=1)
+
+        # # do the same for red
+        # rgba_single = np.zeros((*single_red[i].shape, 4))
+        # rgba_single[..., 0] = single_red[i]  # Set red channel
+        # rgba_single[..., 3] = single_red[i]  # Set alpha channel based on the data value
+        #
+        # ax.imshow(rgba_single, vmax=1)
+
         ax.set_xticks([])
         ax.set_yticks([])
 
     plt.tight_layout()
     plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/toy_data_patches.png')
+
+
+def plot_single_triangle():
+    size = 32
+    a, b = 4, 8
+
+    grid = np.zeros((size, size), dtype=int)
+
+    point_1 = np.array([16, 16])
+
+    point_2 = point_1 + a * np.array([0, 1])
+    point_3 = point_1 + b * np.array([-1, 0])
+
+    for p in [point_1, point_2, point_3]:
+        # Map the points to the nearest grid points
+        p_grid = np.round(p).astype(int) % size
+        np.add.at(grid, tuple(p_grid.T), 1)
+
+    x = grid
+    k = np.fft.fftshift(np.fft.fft2(grid))
+
+    fig, axes = plt.subplots(ncols=2, figsize=(6, 3))
+    axes[0].imshow(x, cmap='Greys', vmax=1)
+    axes[1].imshow(np.abs(k))
+    plt.show()
+    plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/single_triangle.png')
+
 
 if __name__ == '__main__':
 

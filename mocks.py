@@ -37,7 +37,7 @@ def add_triangle_to_grid(size, a, b, num_triangles):
     grid = np.zeros((size, size), dtype=int)
 
     # Generate floating point coordinates for the first point of the triangles
-    x1, y1 = np.random.uniform(0, size, (2, num_triangles))
+    x1, y1 = np.random.uniform(0, size, (2, num_triangles))  # just make it num_triangles, 2 in the first place?
     point_1 = np.stack([x1, y1], axis=1)
 
     direction_2, direction_3 = get_random_orthog_vecs_2d(num_triangles)
