@@ -49,8 +49,9 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
     print("")
 
     # check that these means come from the same distribution with a K-S test
-    shifted_null_means = (null_means - null_means.mean()).numpy()
-    shifted_parity_violating_means = (parity_violating_means - parity_violating_means.mean()).numpy()
+    shifted_null_means = (null_means - null_means.mean()).squeeze(1).numpy()
+    shifted_parity_violating_means = (parity_violating_means - parity_violating_means.mean()).squeeze(1).numpy()
+    # shifted_null_means shape is
     ks_stat, p_val = stats.ks_2samp(shifted_null_means, shifted_parity_violating_means)
     print("K-S test statistic: ", ks_stat)
     print("K-S test p-value: ", p_val)
@@ -113,7 +114,7 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
     print("Cosmic variance std: ", all_universe_means.std())
 
     # check that these means come from the same distribution with a K-S test
-    ks_stat, p_val = stats.ks_2samp(bootstrap_means.numpy(), all_universe_means.numpy())
+    ks_stat, p_val = stats.ks_2samp(bootstrap_means.squeeze(1).numpy(), all_universe_means.squeeze(1).numpy())
     print("K-S test statistic: ", ks_stat)
     print("K-S test p-value: ", p_val)
     print("")
