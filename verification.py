@@ -19,7 +19,7 @@ import argparse
 import os
 import yaml
 from models import NFSTRegressor, CNN, MSTRegressor
-
+import torch
 
 def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
 
