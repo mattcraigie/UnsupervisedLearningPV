@@ -25,12 +25,12 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
 
     # Create the null dataset
     null_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 0.5, 4, 8)
-    null_dataset = TensorDataset(torch.from_numpy(null_data).unsqueeze(1))
+    null_dataset = TensorDataset(torch.from_numpy(null_data).unsqueeze(1).float())
     null_dataloader = DataLoader(null_dataset, batch_size=64, shuffle=False)
 
     # Create the parity violating dataset
     parity_violating_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 1, 4, 8)
-    parity_violating_dataset = TensorDataset(torch.from_numpy(parity_violating_data).unsqueeze(1))
+    parity_violating_dataset = TensorDataset(torch.from_numpy(parity_violating_data).unsqueeze(1).float())
     parity_violating_dataloader = DataLoader(parity_violating_dataset, batch_size=64, shuffle=False)
 
     # Get the bootstrapped means
@@ -89,7 +89,7 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
 
     # create the bootstrapped distribution
     bootstrap_data = create_parity_violating_mocks_2d(num_universes, 32, 16, 1, 4, 8)
-    bootstrap_dataset = TensorDataset(torch.from_numpy(bootstrap_data).unsqueeze(1))
+    bootstrap_dataset = TensorDataset(torch.from_numpy(bootstrap_data).unsqueeze(1).float())
     bootstrap_dataloader = DataLoader(bootstrap_dataset, batch_size=64, shuffle=False)
 
     bootstrap_means = get_bootstrap_means(model, bootstrap_dataloader, num_bootstraps=num_universes)
@@ -98,7 +98,7 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
     all_universe_means = []
     for i in range(num_universes):
         universe_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 1, 4, 8)
-        universe_dataset = TensorDataset(torch.from_numpy(universe_data).unsqueeze(1))
+        universe_dataset = TensorDataset(torch.from_numpy(universe_data).unsqueeze(1).float())
         universe_dataloader = DataLoader(universe_dataset, batch_size=64, shuffle=False)
 
         universe_mean = get_diffs(model, universe_dataloader)
