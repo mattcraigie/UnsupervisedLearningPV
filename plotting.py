@@ -208,7 +208,7 @@ def plot_toy_data_patches():
     mocks = create_parity_violating_mocks_2d(3, 32, 16, 1, 4, 8)
     fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
     for i, ax in enumerate(axes):
-        ax.imshow(mocks[i], cmap='Greys')
+        ax.imshow(mocks[i], cmap='Greys', vmax=2)
         ax.set_xticks([])
         ax.set_yticks([])
 
