@@ -64,8 +64,8 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
     if hist_save_path is not None:
         # plot the two distributions
         fig = plt.figure()
-        plt.hist(shifted_null_means, bins=100, alpha=0.5, label="$\\mu_0^*$")
-        plt.hist(shifted_parity_violating_means, bins=100, alpha=0.5, label="$\\mu^*$")
+        plt.hist(null_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu_0^*$")
+        plt.hist(parity_violating_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
         plt.axvline(0, color='black', linestyle='--')
         plt.xlabel("Means after Bootstrapping")
         plt.ylabel("Frequency")
@@ -82,6 +82,8 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
 
 
 def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None, results_save_path=None):
+
+    # what sizes should num_patches and num_universes be?
 
     # create the bootstrapped distribution
     bootstrap_data = create_parity_violating_mocks_2d(num_universes, 32, 16, 1, 4, 8)
@@ -119,6 +121,9 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
     if hist_save_path is not None:
         # plot the two distributions, only showing the top of the histograms
         fig = plt.figure()
+        print(bootstrap_means.squeeze(1).shape)
+        print(all_universe_means.squeeze(1).shape)
+
         plt.hist(bootstrap_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
         plt.hist(all_universe_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^\\star$")
         plt.xlabel("Means after Bootstrapping")
