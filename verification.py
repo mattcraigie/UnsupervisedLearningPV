@@ -99,10 +99,10 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
         universe_dataset = TensorDataset(torch.from_numpy(universe_data).unsqueeze(1).float())
         universe_dataloader = DataLoader(universe_dataset, batch_size=64, shuffle=False)
 
-        universe_mean = get_diffs(model, universe_dataloader)
+        universe_mean = get_diffs(model, universe_dataloader).mean()
         all_universe_means.append(universe_mean)
 
-    all_universe_means = torch.cat(all_universe_means)
+    all_universe_means = torch.stack(all_universe_means)
 
     print("\n\n\n ~~~ COSMIC VARIANCE TEST ~~~\n\n")
 
