@@ -37,17 +37,17 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
     null_means = get_bootstrap_means(model, null_dataloader, num_bootstraps=10000)
 
     # check that the null means are within 3 sigma of zero
-    print("$\\mu_0^*$ mean: {:.3f}".format(null_means.mean().item()))
-    print("$\\mu_0^*$ std: {:.3f}".format(null_means.std().item()))
+    print("$\\mu_0^*$ mean: {:.3e}".format(null_means.mean().item()))
+    print("$\\mu_0^*$ std: {:.3e}".format(null_means.std().item()))
     std_devs_from_zero = null_means.mean().abs() / null_means.std()
-    print("Standard deviations from zero: {:.3f}".format(std_devs_from_zero.item()))
+    print("Standard deviations from zero: {:.3e}".format(std_devs_from_zero.item()))
     print("")
 
     parity_violating_means = get_bootstrap_means(model, parity_violating_dataloader, num_bootstraps=10000)
-    print("$\\mu^*$ mean: {:.3f}".format(parity_violating_means.mean().item()))
-    print("$\\mu^*$ std: {:.3f}".format(parity_violating_means.std().item()))
+    print("$\\mu^*$ mean: {:.3e}".format(parity_violating_means.mean().item()))
+    print("$\\mu^*$ std: {:.3e}".format(parity_violating_means.std().item()))
     std_devs_from_zero = parity_violating_means.mean().abs() / parity_violating_means.std()
-    print("Standard deviations from zero: {:.3f}".format(std_devs_from_zero.item()))
+    print("Standard deviations from zero: {:.3e}".format(std_devs_from_zero.item()))
     print("")
 
     # check that these means come from the same distribution with a K-S test
@@ -55,8 +55,8 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
     shifted_parity_violating_means = (parity_violating_means - parity_violating_means.mean()).squeeze(1).numpy()
 
     ks_stat, p_val = stats.ks_2samp(shifted_null_means, shifted_parity_violating_means)
-    print("K-S test statistic: {:.3f}".format(ks_stat))
-    print("K-S test p-value: {:.3f}".format(p_val))
+    print("K-S test statistic: {:.3e}".format(ks_stat))
+    print("K-S test p-value: {:.3e}".format(p_val))
     print("")
 
     if hist_save_path is not None:
@@ -73,10 +73,10 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
 
     if results_save_path is not None:
         with open(results_save_path, 'w') as f:
-            f.write("Null means: {:.3f} $\\pm$ {:.3f}\n".format(null_means.mean().item(), null_means.std().item()))
-            f.write("Parity violating means: {:.3f} $\\pm$ {:.3f}\n".format(parity_violating_means.mean().item(), parity_violating_means.std().item()))
-            f.write("K-S test statistic: {:.3f}\n".format(ks_stat))
-            f.write("K-S test p-value: {:.3f}\n".format(p_val))
+            f.write("Null means: {:.3e} $\\pm$ {:.3e}\n".format(null_means.mean().item(), null_means.std().item()))
+            f.write("Parity violating means: {:.3e} $\\pm$ {:.3e}\n".format(parity_violating_means.mean().item(), parity_violating_means.std().item()))
+            f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
+            f.write("K-S test p-value: {:.3e}\n".format(p_val))
 
 
 def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None, results_save_path=None):
@@ -100,16 +100,16 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
 
     all_universe_means = torch.cat(all_universe_means)
 
-    print("Bootstrap mean: {:.3f}".format(bootstrap_means.mean().item()))
-    print("Bootstrap std: {:.3f}".format(bootstrap_means.std().item()))
+    print("Bootstrap mean: {:.3e}".format(bootstrap_means.mean().item()))
+    print("Bootstrap std: {:.3e}".format(bootstrap_means.std().item()))
 
-    print("Cosmic variance mean: {:.3f}".format(all_universe_means.mean().item()))
-    print("Cosmic variance std: {:.3f}".format(all_universe_means.std().item()))
+    print("Cosmic variance mean: {:.3e}".format(all_universe_means.mean().item()))
+    print("Cosmic variance std: {:.3e}".format(all_universe_means.std().item()))
 
     # check that these means come from the same distribution with a K-S test
     ks_stat, p_val = stats.ks_2samp(bootstrap_means.squeeze(1).numpy(), all_universe_means.squeeze(1).numpy())
-    print("K-S test statistic: {}".format(ks_stat))
-    print("K-S test p-value: {}".format(p_val))
+    print("K-S test statistic: {:.3e}".format(ks_stat))
+    print("K-S test p-value: {:.3e}".format(p_val))
     print("")
 
     if hist_save_path is not None:
@@ -126,10 +126,10 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
 
     if results_save_path is not None:
         with open(results_save_path, 'w') as f:
-            f.write("Bootstrap means: {:.3f} $\\pm$ {:.3f}\n".format(bootstrap_means.mean().item(), bootstrap_means.std().item()))
-            f.write("Cosmic variance means: {:.3f} $\\pm$ {:.3f}\n".format(all_universe_means.mean().item(), all_universe_means.std().item()))
-            f.write("K-S test statistic: {:.3f}\n".format(ks_stat))
-            f.write("K-S test p-value: {:.3f}\n".format(p_val))
+            f.write("Bootstrap means: {:.3e} $\\pm$ {:.3e}\n".format(bootstrap_means.mean().item(), bootstrap_means.std().item()))
+            f.write("Cosmic variance means: {:.3e} $\\pm$ {:.3e}\n".format(all_universe_means.mean().item(), all_universe_means.std().item()))
+            f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
+            f.write("K-S test p-value: {:.3e}\n".format(p_val))
 
 
 model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
