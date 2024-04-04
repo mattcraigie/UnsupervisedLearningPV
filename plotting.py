@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import argparse
-
+from mocks import *
 
 def losses_plot(root, techniques, test_type, save_dir):
 
@@ -71,15 +71,15 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
         if value == 'mean':
             y = df['mean']
             error = df['std']
-            plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, color=colour)
+            # plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, color=colour)
             plt.plot(x, y, '-o', label=f'{label}', color=colour)
             plt.fill_between(x, y - error, y + error, alpha=0.1, color=colour)
         elif value == 'median':
             y = df['50%']  # Median
             lower_error = y - df['25%']
             upper_error = df['75%'] - y
-            plt.errorbar(x, y, yerr=[lower_error, upper_error], fmt='-o', capsize=5,
-                         label=f'{label}', color=colour)
+            # plt.errorbar(x, y, yerr=[lower_error, upper_error], fmt='-o', capsize=5,
+            #              label=f'{label}', color=colour)
             plt.fill_between(x, df['25%'], df['75%'], alpha=0.1, color=colour)
             plt.plot(x, y, '-o', label=f'{label}', color=colour)
         elif value == 'max':
@@ -91,9 +91,14 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
 
     # Plotting details
 
+    if 'data_scaling' in csv_paths[0]:
+        plt.xlabel('Training Dataset Size')
+    elif 'nfst_sizes' in csv_paths[0]:
+        plt.xlabel('Number of Neurons')
+
     plt.xlabel('Index')
-    plt.ylabel(value.capitalize())
-    plt.title(f'{value.capitalize()} Across Different CSVs')
+    plt.ylabel(f'{value.capitalize()} $\\eta$')
+    plt.title(f'{value.capitalize()} Parity Violation Detection Score')
     plt.legend()
     plt.grid(True)
     plt.semilogx()
@@ -102,7 +107,7 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
     plt.axhline(y=3, color='black', linestyle='--')
 
     # change the y axis so that it's linear from 0 to 10, then log from 10 to 50
-    plt.yscale('symlog', linthresh=10)
+    # plt.yscale('symlog', linthresh=10)
 
     plt.savefig(f'{plot_name}_{value}.png')
 
@@ -199,10 +204,22 @@ def verification_plot(root, techniques, test_type, save_dir, colours=None):
     plt.savefig(os.path.join(save_dir, test_type + '_verification.png'))
 
 
+def plot_toy_data_patches():
+    mocks = create_parity_violating_mocks_2d(3, 32, 16, 1, 4, 8)
+    fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
+    for i, ax in enumerate(axes):
+        ax.imshow(mocks[i], cmap='Greys')
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    plt.tight_layout()
+    plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/toy_data_patches.png')
+
 if __name__ == '__main__':
 
     datascaling_plot()
     nfst_sizes_plot()
+    plot_toy_data_patches()
 
     # # parse arguments for plotting
     # parser = argparse.ArgumentParser()
