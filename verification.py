@@ -182,9 +182,6 @@ if __name__ == '__main__':
     model = model_class(**config['analysis_kwargs']['model_kwargs'])
     model.load_state_dict(torch.load(args.model_save_path))
 
-    # Load the model
-    model = torch.load("model.pt")
-
     # Run the null test
     null_test(model, args.num_patches, hist_save_path="null_test.png", results_save_path="null_test_results.txt")
 
