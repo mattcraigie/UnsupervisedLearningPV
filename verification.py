@@ -85,9 +85,7 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
             f.write("K-S Test P-Value: {}\n".format(p_val))
 
 
-def cosmic_variance_test(model, num_patches, num_universes, device, hist_save_path=None, results_save_path=None):
-
-    model.to(device)
+def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None, results_save_path=None):
 
     # create the bootstrapped distribution
     bootstrap_data = create_parity_violating_mocks_2d(num_universes, 32, 16, 1, 4, 8)
@@ -181,12 +179,15 @@ if __name__ == '__main__':
 
     model = model_class(**config['analysis_kwargs']['model_kwargs'])
     model.load_state_dict(torch.load(args.model_save_path))
+    model.to(torch.device("cuda"))
 
     # Run the null test
-    null_test(model, args.num_patches, hist_save_path="null_test.png", results_save_path="null_test_results.txt")
+    null_test(model, args.num_patches,
+              hist_save_path=os.path.join(args.save_dir, "null_test.png"),
+              results_save_path=os.path.join(args.save_dir, "null_test_results.txt"))
 
     # Run the cosmic variance test
-    cosmic_variance_test(model, args.num_patches, args.num_universes, torch.device("cuda"),
-                         hist_save_path="cosmic_variance_test.png",
-                         results_save_path="cosmic_variance_test_results.txt")
+    cosmic_variance_test(model, args.num_patches, args.num_universes,
+                         hist_save_path=os.path.join(args.save_dir, "cosmic_variance_test.png"),
+                         results_save_path=os.path.join(args.save_dir, "cosmic_variance_test_results.txt")
 
