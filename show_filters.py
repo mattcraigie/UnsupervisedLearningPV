@@ -147,6 +147,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model_save_path', type=str, required=True)
     parser.add_argument('-c', '--config_path', type=str, required=True)
     parser.add_argument('-s', '--save_dir', type=str, required=True)
+    parser.add_argument('-n', '--num_neurons', type=int, default=256, required=False)
 
 
     args = parser.parse_args()
@@ -155,6 +156,9 @@ if __name__ == '__main__':
     config_path = os.path.join(args.config_path)
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
+
+    if args['num_neurons'] is not None:
+        config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [args['num_neurons'], args['num_neurons']]
 
     model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
     model.load_state_dict(torch.load(args.model_save_path))
