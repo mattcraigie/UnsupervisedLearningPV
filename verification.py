@@ -36,6 +36,8 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
     # Get the bootstrapped means
     null_means = get_bootstrap_means(model, null_dataloader, num_bootstraps=10000)
 
+    print("\n\n\n~~~ NULL TEST ~~~\n\n")
+
     # check that the null means are within 3 sigma of zero
     print("$\\mu_0^*$ mean: {:.3e}".format(null_means.mean().item()))
     print("$\\mu_0^*$ std: {:.3e}".format(null_means.std().item()))
@@ -99,6 +101,8 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
         all_universe_means.append(universe_mean)
 
     all_universe_means = torch.cat(all_universe_means)
+
+    print("\n\n\n ~~~ COSMIC VARIANCE TEST ~~~\n\n")
 
     print("Bootstrap mean: {:.3e}".format(bootstrap_means.mean().item()))
     print("Bootstrap std: {:.3e}".format(bootstrap_means.std().item()))
