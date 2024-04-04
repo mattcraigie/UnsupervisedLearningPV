@@ -158,7 +158,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model_save_path', type=str, required=True)
     parser.add_argument('-c', '--config_path', type=str, required=True)
     parser.add_argument('-s', '--save_dir', type=str, required=True)
-    parser.add_argument('-n', '--num_neurons', type=int, default=256, required=False)
+    parser.add_argument('-n', '--num_neurons', type=int, default=128, required=False)
     parser.add_argument('-p', '--num_patches', type=int, default=1000, required=False)
     parser.add_argument('-u', '--num_universes', type=int, default=1000, required=False)
 
