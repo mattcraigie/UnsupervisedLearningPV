@@ -20,8 +20,13 @@ import os
 import yaml
 from models import NFSTRegressor, CNN, MSTRegressor
 import torch
+import numpy as np
 
-def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
+
+model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
+
+
+def null_test(model, num_patches, save_dir=None):
 
     # Create the null dataset
     null_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 0.5, 4, 8)
@@ -33,57 +38,38 @@ def null_test(model, num_patches, hist_save_path=None, results_save_path=None):
     parity_violating_dataset = TensorDataset(torch.from_numpy(parity_violating_data).unsqueeze(1).float())
     parity_violating_dataloader = DataLoader(parity_violating_dataset, batch_size=64, shuffle=False)
 
-    # Get the bootstrapped means
+    # Get the bootstrapped means and see the standard deviations from zero
     null_means = get_bootstrap_means(model, null_dataloader, num_bootstraps=10000)
-
-    print("\n\n\n~~~ NULL TEST ~~~\n\n")
-
-    # check that the null means are within 3 sigma of zero
-    print("$\\mu_0^*$ mean: {:.3e}".format(null_means.mean().item()))
-    print("$\\mu_0^*$ std: {:.3e}".format(null_means.std().item()))
-    std_devs_from_zero = null_means.mean().abs() / null_means.std()
-    print("Standard deviations from zero: {:.3e}".format(std_devs_from_zero.item()))
-    print("")
+    null_std_devs_from_zero = null_means.mean().abs() / null_means.std()
 
     parity_violating_means = get_bootstrap_means(model, parity_violating_dataloader, num_bootstraps=10000)
-    print("$\\mu^*$ mean: {:.3e}".format(parity_violating_means.mean().item()))
-    print("$\\mu^*$ std: {:.3e}".format(parity_violating_means.std().item()))
-    std_devs_from_zero = parity_violating_means.mean().abs() / parity_violating_means.std()
-    print("Standard deviations from zero: {:.3e}".format(std_devs_from_zero.item()))
-    print("")
+    pv_std_devs_from_zero = parity_violating_means.mean().abs() / parity_violating_means.std()
 
     # check that these means come from the same distribution with a K-S test
     shifted_null_means = (null_means - null_means.mean()).squeeze(1).numpy()
     shifted_parity_violating_means = (parity_violating_means - parity_violating_means.mean()).squeeze(1).numpy()
-
     ks_stat, p_val = stats.ks_2samp(shifted_null_means, shifted_parity_violating_means)
-    print("K-S test statistic: {:.3e}".format(ks_stat))
-    print("K-S test p-value: {:.3e}".format(p_val))
-    print("")
 
-    if hist_save_path is not None:
-        # plot the two distributions
-        fig = plt.figure()
-        plt.hist(null_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu_0^*$")
-        plt.hist(parity_violating_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
-        plt.axvline(0, color='black', linestyle='--')
-        plt.xlabel("Means after Bootstrapping")
-        plt.ylabel("Frequency")
-        plt.title("Null vs. Parity Violating Means")
+    # write the above to a file, maintaining the same formatting
+    save_file = os.path.join(save_dir, 'null_test_results.txt')
 
-        plt.savefig(hist_save_path)
+    with open(save_file, 'a') as f:
+        f.write("\n\n\n~~~ NULL TEST ~~~\n\n")
+        f.write("$\\mu_0^*$ mean: {:.3e}\n".format(null_means.mean().item()))
+        f.write("$\\mu_0^*$ std: {:.3e}\n".format(null_means.std().item()))
+        f.write("Standard deviations from zero: {:.3e}\n\n".format(null_std_devs_from_zero.item()))
+        f.write("$\\mu^*$ mean: {:.3e}\n".format(parity_violating_means.mean().item()))
+        f.write("$\\mu^*$ std: {:.3e}\n".format(parity_violating_means.std().item()))
+        f.write("Standard deviations from zero: {:.3e}\n\n".format(pv_std_devs_from_zero.item()))
+        f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
+        f.write("K-S test p-value: {:.3e}\n\n")
 
-    if results_save_path is not None:
-        with open(results_save_path, 'w') as f:
-            f.write("Null means: {:.3e} $\\pm$ {:.3e}\n".format(null_means.mean().item(), null_means.std().item()))
-            f.write("Parity violating means: {:.3e} $\\pm$ {:.3e}\n".format(parity_violating_means.mean().item(), parity_violating_means.std().item()))
-            f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
-            f.write("K-S test p-value: {:.3e}\n".format(p_val))
+    # save the bootstrap and cosmic variance means
+    np.save(os.path.join(save_dir, 'null_means.npy'), null_means.numpy())
+    np.save(os.path.join(save_dir, 'parity_violating_means.npy'), parity_violating_means.numpy())
 
 
-def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None, results_save_path=None):
-
-    # what sizes should num_patches and num_universes be?
+def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
 
     # create the bootstrapped distribution
     bootstrap_data = create_parity_violating_mocks_2d(num_universes, 32, 16, 1, 4, 8)
@@ -104,45 +90,61 @@ def cosmic_variance_test(model, num_patches, num_universes, hist_save_path=None,
 
     all_universe_means = torch.stack(all_universe_means)
 
-    print("\n\n\n ~~~ COSMIC VARIANCE TEST ~~~\n\n")
-
-    print("Bootstrap mean: {:.3e}".format(bootstrap_means.mean().item()))
-    print("Bootstrap std: {:.3e}".format(bootstrap_means.std().item()))
-
-    print("Cosmic variance mean: {:.3e}".format(all_universe_means.mean().item()))
-    print("Cosmic variance std: {:.3e}".format(all_universe_means.std().item()))
-
     # check that these means come from the same distribution with a K-S test
     shifted_bootstrap_means = (bootstrap_means - bootstrap_means.mean()).squeeze(1).numpy()
     shifted_all_universe_means = (all_universe_means - all_universe_means.mean()).numpy()
-
     ks_stat, p_val = stats.ks_2samp(shifted_bootstrap_means, shifted_all_universe_means)
-    print("K-S test statistic: {:.3e}".format(ks_stat))
-    print("K-S test p-value: {:.3e}".format(p_val))
-    print("")
-
-    if hist_save_path is not None:
-        # plot the two distributions, only showing the top of the histograms
-        fig = plt.figure()
-
-        plt.hist(bootstrap_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
-        plt.hist(all_universe_means, bins=100, alpha=0.5, label="$\\mu^\\star$")
-        plt.xlabel("Means after Bootstrapping")
-        plt.ylabel("Frequency")
-        plt.title("Bootstrap vs. Cosmic Variance Means")
-        plt.legend()
-
-        plt.savefig(hist_save_path)
-
-    if results_save_path is not None:
-        with open(results_save_path, 'w') as f:
-            f.write("Bootstrap means: {:.3e} $\\pm$ {:.3e}\n".format(bootstrap_means.mean().item(), bootstrap_means.std().item()))
-            f.write("Cosmic variance means: {:.3e} $\\pm$ {:.3e}\n".format(all_universe_means.mean().item(), all_universe_means.std().item()))
-            f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
-            f.write("K-S test p-value: {:.3e}\n".format(p_val))
 
 
-model_lookup = {'nfst': NFSTRegressor, 'mst': MSTRegressor, 'cnn': CNN}
+    save_file = os.path.join(save_dir, 'cosmic_variance_test_results.txt')
+    with open(save_file, 'a') as f:
+        f.write("\n\n\n~~~ COSMIC VARIANCE TEST ~~~\n\n")
+        f.write("Bootstrap mean: {:.3e}\n".format(bootstrap_means.mean().item()))
+        f.write("Bootstrap std: {:.3e}\n\n")
+        f.write("Cosmic variance mean: {:.3e}\n".format(all_universe_means.mean().item()))
+        f.write("Cosmic variance std: {:.3e}\n\n")
+        f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
+        f.write("K-S test p-value: {:.3e}\n\n")
+
+    # save the bootstrap and cosmic variance means
+    np.save(os.path.join(save_dir, 'bootstrap_means.npy'), bootstrap_means.numpy())
+    np.save(os.path.join(save_dir, 'all_universe_means.npy'), all_universe_means.numpy())
+
+
+def plot_histograms(save_dir):
+
+    # plot the null test histograms
+
+    # load the means
+    null_means = np.load(os.path.join(save_dir, 'null_means.npy'))
+    parity_violating_means = np.load(os.path.join(save_dir, 'parity_violating_means.npy'))
+
+    # plot the two distributions
+    fig = plt.figure()
+    plt.hist(null_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu_0^*$")
+    plt.hist(parity_violating_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
+    plt.axvline(0, color='black', linestyle='--')
+    plt.xlabel("Means after Bootstrapping")
+    plt.ylabel("Frequency")
+    plt.title("Null vs. Parity Violating Means")
+
+    plt.savefig(os.path.join(save_dir, 'null_histograms.png'))
+
+    # plot the cosmic variance test histograms
+
+    # load the means
+    bootstrap_means = np.load(os.path.join(save_dir, 'bootstrap_means.npy'))
+    all_universe_means = np.load(os.path.join(save_dir, 'all_universe_means.npy'))
+
+    fig = plt.figure()
+    plt.hist(bootstrap_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
+    plt.hist(all_universe_means, bins=100, alpha=0.5, label="$\\mu^\\star$")
+    plt.xlabel("Means after Bootstrapping")
+    plt.ylabel("Frequency")
+    plt.title("Bootstrap vs. Cosmic Variance Means")
+    plt.legend()
+
+    plt.savefig(os.path.join(save_dir, 'cosmic_variance_histograms.png'))
 
 
 if __name__ == '__main__':
@@ -156,35 +158,36 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--num_neurons', type=int, default=128, required=False)
     parser.add_argument('-p', '--num_patches', type=int, default=1000, required=False)
     parser.add_argument('-u', '--num_universes', type=int, default=1000, required=False)
+    parser.add_argument('-a', '--already_run', type=bool, default=False, required=False)
 
     args = parser.parse_args()
 
-    # load config yaml
-    config_path = os.path.join(args.config_path)
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
+    if not args.already_run:
 
-    if args.num_neurons is not None:
-        config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [args.num_neurons, args.num_neurons]
+        # load config yaml
+        config_path = os.path.join(args.config_path)
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
 
-    model_type = config['analysis_kwargs']['model_type']
-    model_name = config['analysis_kwargs']['model_name']
-    try:
-        model_class = model_lookup[model_type]
-    except KeyError:
-        raise KeyError(f'Unrecognized model type {model_type} for {model_name} analysis')
+        if args.num_neurons is not None:
+            config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [args.num_neurons, args.num_neurons]
 
-    model = model_class(**config['analysis_kwargs']['model_kwargs'])
-    model.load_state_dict(torch.load(args.model_save_path))
-    model.to(torch.device("cuda"))
+        model_type = config['analysis_kwargs']['model_type']
+        model_name = config['analysis_kwargs']['model_name']
+        try:
+            model_class = model_lookup[model_type]
+        except KeyError:
+            raise KeyError(f'Unrecognized model type {model_type} for {model_name} analysis')
 
-    # Run the null test
-    null_test(model, args.num_patches,
-              hist_save_path=os.path.join(args.save_dir, "null_test.png"),
-              results_save_path=os.path.join(args.save_dir, "null_test_results.txt"))
+        model = model_class(**config['analysis_kwargs']['model_kwargs'])
+        model.load_state_dict(torch.load(args.model_save_path))
+        model.to(torch.device("cuda"))
 
-    # Run the cosmic variance test
-    cosmic_variance_test(model, args.num_patches, args.num_universes,
-                         hist_save_path=os.path.join(args.save_dir, "cosmic_variance_test.png"),
-                         results_save_path=os.path.join(args.save_dir, "cosmic_variance_test_results.txt"))
+        # Run the null test
+        null_test(model, args.num_patches, args.save_dir)
 
+        # Run the cosmic variance test
+        cosmic_variance_test(model, args.num_patches, args.num_universes, args.save_dir)
+
+    # plot the histograms
+    plot_histograms(args.save_dir)
