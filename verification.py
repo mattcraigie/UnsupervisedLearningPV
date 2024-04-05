@@ -121,9 +121,9 @@ def plot_histograms(save_dir):
 
     # plot the two distributions
     fig, axes = plt.subplots(ncols=2, figsize=(12, 5))
-    axes[0].hist(parity_violating_means, bins=50, alpha=0.6, label="$\\mu^*$")
+    axes[0].hist(parity_violating_means, bins=50, alpha=0.6, label="PV Bootstrapped Means ($\\mu^*$)")
     counts, bins = np.histogram(null_means, bins=50)
-    axes[0].stairs(counts, bins, label='$\\mu_0^*$', linewidth=2, ec='black')
+    axes[0].stairs(counts, bins, label='Non-PV Bootstrapped Means ($\\mu_0^*$)', linewidth=2, ec='black')
 
     # axes[0].hist(a, bins=50, alpha=0.5, label="$\\mu_0^*$", color='black')
     axes[0].axvline(0, color='black', linestyle='--')
@@ -152,9 +152,9 @@ def plot_histograms(save_dir):
 
     # plot the two distributions
     fig, axes = plt.subplots(ncols=2, figsize=(12, 5))
-    axes[0].hist(bootstrap_means, bins=50, alpha=0.6, label="$\\mu^*$")
+    axes[0].hist(bootstrap_means, bins=50, alpha=0.6, label="Single Survey Bootstrapped Means ($\\mu^*$)")
     counts, bins = np.histogram(all_universe_means, bins=50)
-    axes[0].stairs(counts, bins, label='$\\mu^\\star$', linewidth=2, ec='darkgreen')
+    axes[0].stairs(counts, bins, label='Cosmic Variance Means ($\\mu^\\star$)', linewidth=2, ec='darkgreen')
 
     # axes[0].hist(a, bins=50, alpha=0.5, label="$\\mu_0^*$", color='black')
     # axes[0].axvline(0, color='black', linestyle='--')
