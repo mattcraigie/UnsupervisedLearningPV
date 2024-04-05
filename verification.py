@@ -157,7 +157,7 @@ def plot_histograms(save_dir):
     axes[0].stairs(counts, bins, label='$\\mu^\\star$', linewidth=2, ec='darkgreen')
 
     # axes[0].hist(a, bins=50, alpha=0.5, label="$\\mu_0^*$", color='black')
-    axes[0].axvline(0, color='black', linestyle='--')
+    # axes[0].axvline(0, color='black', linestyle='--')
     axes[0].set_xlabel("Means")
     axes[0].set_ylabel("Frequency")
     axes[0].legend()
