@@ -131,8 +131,12 @@ def plot_histograms(save_dir):
     axes[0].set_ylabel("Frequency")
     axes[0].legend()
 
-    axes[1].hist(parity_violating_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
-    counts, bins = np.histogram(null_means, bins=50)
+    # plot the shifted distributions
+    shifted_null_means = null_means - null_means.mean()
+    shifted_parity_violating_means = parity_violating_means - parity_violating_means.mean()
+
+    axes[1].hist(shifted_parity_violating_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
+    counts, bins = np.histogram(shifted_null_means, bins=50)
     axes[1].stairs(counts, bins, label='Centred $\\mu_0^*$', linewidth=2, ec='black')
     axes[1].legend()
     axes[1].set_xlabel("Shifted Means")
@@ -158,31 +162,17 @@ def plot_histograms(save_dir):
     axes[0].set_ylabel("Frequency")
     axes[0].legend()
 
-    axes[1].hist(bootstrap_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
-    counts, bins = np.histogram(parity_violating_means, bins=50)
+    # plot the shifted distributions
+    shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
+    shifted_all_universe_means = all_universe_means - all_universe_means.mean()
+
+    axes[1].hist(shifted_bootstrap_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
+    counts, bins = np.histogram(shifted_all_universe_means, bins=50)
     axes[1].stairs(counts, bins, label='Centred $\\mu^\\star$', linewidth=2, ec='darkgreen')
     axes[1].legend()
     axes[1].set_xlabel("Shifted Means")
 
     plt.suptitle("Cosmic Variance Verification")
-    plt.show()
-
-
-
-    # plot the cosmic variance test histograms
-
-    # load the means
-    bootstrap_means = np.load(os.path.join(save_dir, 'bootstrap_means.npy'))
-    all_universe_means = np.load(os.path.join(save_dir, 'all_universe_means.npy'))
-
-    fig = plt.figure()
-    plt.hist(bootstrap_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
-    plt.hist(all_universe_means, bins=100, alpha=0.5, label="$\\mu^\\star$")
-    plt.xlabel("Means after Bootstrapping")
-    plt.ylabel("Frequency")
-    plt.title("Bootstrap vs. Cosmic Variance Means")
-    plt.legend()
-
     plt.savefig(os.path.join(save_dir, 'cosmic_variance_histograms.png'))
 
 
