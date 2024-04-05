@@ -65,8 +65,8 @@ def null_test(model, num_patches, save_dir=None):
         f.write("K-S test p-value: {:.3e}\n\n")
 
     # save the bootstrap and cosmic variance means
-    np.save(os.path.join(save_dir, 'null_means.npy'), null_means.numpy())
-    np.save(os.path.join(save_dir, 'parity_violating_means.npy'), parity_violating_means.numpy())
+    np.save(os.path.join(save_dir, 'null_means.npy'), null_means.squeeze(1).numpy())
+    np.save(os.path.join(save_dir, 'parity_violating_means.npy'), parity_violating_means.squeeze(1).numpy())
 
 
 def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
@@ -76,7 +76,7 @@ def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
     bootstrap_dataset = TensorDataset(torch.from_numpy(bootstrap_data).unsqueeze(1).float())
     bootstrap_dataloader = DataLoader(bootstrap_dataset, batch_size=64, shuffle=False)
 
-    bootstrap_means = get_bootstrap_means(model, bootstrap_dataloader, num_bootstraps=num_universes)
+    bootstrap_means = get_bootstrap_means(model, bootstrap_dataloader, num_bootstraps=10000)
 
     # create the cosmic variance distribution
     all_universe_means = []
@@ -107,28 +107,67 @@ def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
         f.write("K-S test p-value: {:.3e}\n\n")
 
     # save the bootstrap and cosmic variance means
-    np.save(os.path.join(save_dir, 'bootstrap_means.npy'), bootstrap_means.numpy())
+    np.save(os.path.join(save_dir, 'bootstrap_means.npy'), bootstrap_means.squeeze(1).numpy())
     np.save(os.path.join(save_dir, 'all_universe_means.npy'), all_universe_means.numpy())
 
 
 def plot_histograms(save_dir):
 
-    # plot the null test histograms
+    # NULL TEST
 
     # load the means
     null_means = np.load(os.path.join(save_dir, 'null_means.npy'))
     parity_violating_means = np.load(os.path.join(save_dir, 'parity_violating_means.npy'))
 
     # plot the two distributions
-    fig = plt.figure()
-    plt.hist(null_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu_0^*$")
-    plt.hist(parity_violating_means.squeeze(1), bins=100, alpha=0.5, label="$\\mu^*$")
-    plt.axvline(0, color='black', linestyle='--')
-    plt.xlabel("Means after Bootstrapping")
-    plt.ylabel("Frequency")
-    plt.title("Null vs. Parity Violating Means")
+    fig, axes = plt.subplots(ncols=2, figsize=(12, 5))
+    axes[0].hist(parity_violating_means, bins=50, alpha=0.6, label="$\\mu^*$")
+    counts, bins = np.histogram(null_means, bins=50)
+    axes[0].stairs(counts, bins, label='$\\mu_0^*$', linewidth=2, ec='black')
 
+    # axes[0].hist(a, bins=50, alpha=0.5, label="$\\mu_0^*$", color='black')
+    axes[0].axvline(0, color='black', linestyle='--')
+    axes[0].set_xlabel("Means")
+    axes[0].set_ylabel("Frequency")
+    axes[0].legend()
+
+    axes[1].hist(parity_violating_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
+    counts, bins = np.histogram(null_means, bins=50)
+    axes[1].stairs(counts, bins, label='Centred $\\mu_0^*$', linewidth=2, ec='black')
+    axes[1].legend()
+    axes[1].set_xlabel("Shifted Means")
+
+    plt.suptitle("Parity Violation Detection Model Verification")
     plt.savefig(os.path.join(save_dir, 'null_histograms.png'))
+
+    # COSMIC VARIANCE TEST
+
+    # load the means
+    bootstrap_means = np.load(os.path.join(save_dir, 'bootstrap_means.npy'))
+    all_universe_means = np.load(os.path.join(save_dir, 'all_universe_means.npy'))
+
+    # plot the two distributions
+    fig, axes = plt.subplots(ncols=2, figsize=(12, 5))
+    axes[0].hist(bootstrap_means, bins=50, alpha=0.6, label="$\\mu^*$")
+    counts, bins = np.histogram(all_universe_means, bins=50)
+    axes[0].stairs(counts, bins, label='$\\mu^\\star$', linewidth=2, ec='darkgreen')
+
+    # axes[0].hist(a, bins=50, alpha=0.5, label="$\\mu_0^*$", color='black')
+    axes[0].axvline(0, color='black', linestyle='--')
+    axes[0].set_xlabel("Means")
+    axes[0].set_ylabel("Frequency")
+    axes[0].legend()
+
+    axes[1].hist(bootstrap_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
+    counts, bins = np.histogram(parity_violating_means, bins=50)
+    axes[1].stairs(counts, bins, label='Centred $\\mu^\\star$', linewidth=2, ec='darkgreen')
+    axes[1].legend()
+    axes[1].set_xlabel("Shifted Means")
+
+    plt.suptitle("Cosmic Variance Verification")
+    plt.show()
+
+
 
     # plot the cosmic variance test histograms
 
