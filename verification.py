@@ -193,6 +193,8 @@ if __name__ == '__main__':
 
     if not args.already_run:
 
+        print('Running')
+
         # load config yaml
         config_path = os.path.join(args.config_path)
         with open(config_path, 'r') as f:
