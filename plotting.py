@@ -140,7 +140,7 @@ def plot_datascaling_from_csvs(csv_paths, labels, plot_name, value='mean'):
     fig.text(0.04, 0.5, f'{value.capitalize()} $\\eta$', va='center', rotation='vertical')
 
     ax1.set_ylim(-3, 10)  # Limiting y-axis
-    ax2.set_ylim(10, 50)  # Limiting y-axis
+    ax2.set_ylim(10, 80)  # Limiting y-axis
 
     # Adjust ax1 (bottom subplot) position
     pos1 = ax1.get_position()  # get the original position of ax1
