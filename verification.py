@@ -178,6 +178,8 @@ def plot_histograms(save_dir):
 
 if __name__ == '__main__':
 
+    print("RUUNINGG???")
+
     parser = argparse.ArgumentParser()
 
     # redo the above with shortened options
