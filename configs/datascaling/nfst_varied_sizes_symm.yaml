@@ -4,7 +4,7 @@ device: "cuda"  # Change to 'cpu' if needed
 analysis_kwargs:
   output_root: "//scratch/smp/uqmcrai4/parity/output"  # Directory where the analysis folders will be created
   model_type: "nfst"  # Type of model to be used
-  model_name: "nfst_noinit"
+  model_name: "nfst_symm"
 
   # Model-specific configurations (modify based on the model type)
   model_kwargs:
@@ -15,6 +15,7 @@ analysis_kwargs:
     reduction: 'asymm_ang_avg'
     linear_hiddens: 128
     init_morlet: false
+    symmetric_filters: true
 
   # Mock generation specific configurations
   mock_kwargs:
