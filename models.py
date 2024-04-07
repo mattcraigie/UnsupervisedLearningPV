@@ -11,7 +11,7 @@ import copy
 
 class NFSTRegressor(nn.Module):
     def __init__(self, size, num_scales, num_angles=4, subnet_hidden_sizes=(32, 32), init_morlet=True,
-                 reduction='asymm_ang_avg', linear_hiddens=128):
+                 reduction='asymm_ang_avg', linear_hiddens=128, symmetric_filters=False):
         super(NFSTRegressor, self).__init__()
 
         self.size = size
@@ -20,8 +20,8 @@ class NFSTRegressor(nn.Module):
 
         self.subnet = SubNet(num_ins=3, hidden_sizes=subnet_hidden_sizes, num_outs=1, hidden_activation=nn.LeakyReLU)
 
-        self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet, symmetric=False,
-                                            init_morlet=init_morlet, full_rotation=True)
+        self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
+                                            symmetric=symmetric_filters, init_morlet=init_morlet, full_rotation=True)
         self.filters.update_filters()
 
         # get the initial filters state dict
