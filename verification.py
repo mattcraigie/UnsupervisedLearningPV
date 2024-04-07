@@ -147,7 +147,7 @@ def plot_histograms(save_dir):
     # COSMIC VARIANCE TEST
 
     # load the means
-    bootstrap_means = np.load(os.path.join(save_dir, 'bootstrap_means.npy'))
+    bootstrap_means = np.load(os.path.join(save_dir, 'parity_violating_means.npy')) #np.load(os.path.join(save_dir, 'bootstrap_means.npy'))
     all_universe_means = np.load(os.path.join(save_dir, 'all_universe_means.npy'))
 
     # plot the two distributions
