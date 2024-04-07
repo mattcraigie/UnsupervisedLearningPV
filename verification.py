@@ -72,7 +72,7 @@ def null_test(model, num_patches, save_dir=None):
 def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
 
     # create the bootstrapped distribution
-    bootstrap_data = create_parity_violating_mocks_2d(num_universes, 32, 16, 1, 4, 8)
+    bootstrap_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 1, 4, 8)
     bootstrap_dataset = TensorDataset(torch.from_numpy(bootstrap_data).unsqueeze(1).float())
     bootstrap_dataloader = DataLoader(bootstrap_dataset, batch_size=64, shuffle=False)
 
