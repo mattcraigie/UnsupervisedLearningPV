@@ -45,15 +45,7 @@ def losses_plot(root, techniques, test_type, save_dir):
         plt.savefig(os.path.join(save_dir, test_type + '_' + technique + '_losses.png'))
 
 
-def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
-    """
-    Plots the specified values directly from multiple CSV files against their index columns.
-
-    Parameters:
-    - csv_paths: List of paths to the CSV files.
-    - labels: List of labels corresponding to each CSV file for the plot legend.
-    - value: 'mean' to plot mean with std error bars, or 'median' to plot median with 25-75% intervals.
-    """
+def plot_nfst_sizes_from_csvs(csv_paths, labels, plot_name, value='mean'):
     if len(csv_paths) != len(labels):
         raise ValueError("The number of CSV paths must match the number of labels.")
 
@@ -89,44 +81,82 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
         else:
             raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
 
-    # Plotting details
+    plt.xlabel('Number of Neurons')
+    plt.ylabel(f'{value.capitalize()} $\\eta$')
+    plt.title(f'{value.capitalize()} Parity Violation Detection Score')
+    plt.legend()
+    plt.grid(True)
+    plt.semilogx()
 
-    if 'data_scaling' in csv_paths[0]:
-        plt.xlabel('Training Dataset Size')
+    # a black line at y=3
+    plt.axhline(y=3, color='black', linestyle='--')
 
-        # change the yscale so that 0 to 10 takes up the bottom half, and 10 to 50 takes up the top half
-        # this is two linear scales.
-        # Splitting the data at y=10
-        fig, (ax2, ax1) = plt.subplots(2, 1, sharex=True)
+    plt.savefig(f'{plot_name}_{value}.png')
 
-        # Plot the lower range data in ax1
-        ax1.plot(x, y, 'r-')
-        ax1.set_ylim(0, 10)  # Limiting y-axis
 
-        # Plot the upper range data in ax2
-        ax2.plot(x, y, 'b-')
-        ax2.set_ylim(10, 50)  # Limiting y-axis
+def plot_datascaling_from_csvs(csv_paths, labels, plot_name, value='mean'):
+    if len(csv_paths) != len(labels):
+        raise ValueError("The number of CSV paths must match the number of labels.")
 
-        # Adjust ax1 (bottom subplot) position
-        pos1 = ax1.get_position()  # get the original position of ax1
-        pos2 = ax2.get_position()  # get the original position of ax2
-        height_adjusted = (pos1.height + pos2.height) / 2  # calculate the new height
+    fig, (ax2, ax1) = plt.subplots(2, 1, sharex=True)
 
-        # Set new positions
-        pos1_new = [pos1.x0, pos1.y0, pos1.width, height_adjusted]
-        pos2_new = [pos2.x0, pos1.y0 + height_adjusted, pos2.width, height_adjusted]
+    colours = ['red', 'goldenrod', 'blue', 'pink']
 
-        ax1.set_position(pos1_new)
-        ax2.set_position(pos2_new)
+    for csv_path, label, colour in zip(csv_paths, labels, colours):
+        # Read the CSV into a DataFrame
+        df = pd.read_csv(csv_path)
 
-        # Removing the spines and ticks of the bottom plot of ax2 to clean up the interface
-        ax2.spines['bottom'].set_visible(False)
-        ax2.tick_params(labelbottom=False)
+        # Assuming the first unnamed column represents sample sizes and is used as the x-axis
+        x = df.iloc[:, 0]
 
-    elif 'nfst_sizes' in csv_paths[0]:
-        plt.xlabel('Number of Neurons')
+        if value == 'mean':
+            y = df['mean']
+            error = df['std']
+            # plt.errorbar(x, y, yerr=error, fmt='-o', capsize=5, color=colour)
+            ax1.plot(x, y, '-o', label=f'{label}', color=colour)
+            ax1.fill_between(x, y - error, y + error, alpha=0.1, color=colour)
 
-    plt.xlabel('Index')
+            ax2.plot(x, y, '-o', label=f'{label}', color=colour)
+            ax2.fill_between(x, y - error, y + error, alpha=0.1, color=colour)
+        elif value == 'median':
+            y = df['50%']  # Median
+            lower_error = y - df['25%']
+            upper_error = df['75%'] - y
+            # plt.errorbar(x, y, yerr=[lower_error, upper_error], fmt='-o', capsize=5,
+            #              label=f'{label}', color=colour)
+            ax1.fill_between(x, df['25%'], df['75%'], alpha=0.1, color=colour)
+            ax1.plot(x, y, '-o', label=f'{label}', color=colour)
+
+            ax2.fill_between(x, df['25%'], df['75%'], alpha=0.1, color=colour)
+            ax2.plot(x, y, '-o', label=f'{label}', color=colour)
+        elif value == 'max':
+            y = df['max']
+            plt.plot(x, y, '-o', label=f'{label}', color=colour)
+
+        else:
+            raise ValueError("Invalid value option. Choose 'mean' or 'median'.")
+
+    plt.xlabel('Training Dataset Size')
+
+    ax1.set_ylim(0, 10)  # Limiting y-axis
+    ax2.set_ylim(10, 50)  # Limiting y-axis
+
+    # Adjust ax1 (bottom subplot) position
+    pos1 = ax1.get_position()  # get the original position of ax1
+    pos2 = ax2.get_position()  # get the original position of ax2
+    height_adjusted = (pos1.height + pos2.height) / 2  # calculate the new height
+
+    # Set new positions
+    pos1_new = [pos1.x0, pos1.y0, pos1.width, height_adjusted]
+    pos2_new = [pos2.x0, pos1.y0 + height_adjusted, pos2.width, height_adjusted]
+
+    ax1.set_position(pos1_new)
+    ax2.set_position(pos2_new)
+
+    # Removing the spines and ticks of the bottom plot of ax2 to clean up the interface
+    ax2.spines['bottom'].set_visible(False)
+    ax2.tick_params(labelbottom=False)
+
     plt.ylabel(f'{value.capitalize()} $\\eta$')
     plt.title(f'{value.capitalize()} Parity Violation Detection Score')
     plt.legend()
@@ -151,9 +181,9 @@ def datascaling_plot():
     labels = ['NFST', 'WST', 'CNN']
     save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/data_scaling'
 
-    plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
-    plot_data_from_csvs(all_csvs, labels, save_path, value='median')
-    plot_data_from_csvs(all_csvs, labels, save_path, value='max')
+    plot_datascaling_from_csvs(all_csvs, labels, save_path, value='mean')
+    plot_datascaling_from_csvs(all_csvs, labels, save_path, value='median')
+    plot_datascaling_from_csvs(all_csvs, labels, save_path, value='max')
 
     save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/'
     losses_plot(root, folders, 'data_scaling', save_path)
@@ -168,12 +198,12 @@ def nfst_sizes_plot():
     for folder in folders:
         all_csvs.append(os.path.join(root, folder, 'summary.csv'))
 
-    labels = ['NFST - Morlet Init.', 'NFST - Random Init.']
+    labels = ['Morlet Init.', 'Random Init.', 'Symmetric']
     save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/nfst_sizes'
 
-    plot_data_from_csvs(all_csvs, labels, save_path, value='mean')
-    plot_data_from_csvs(all_csvs, labels, save_path, value='median')
-    plot_data_from_csvs(all_csvs, labels, save_path, value='max')
+    plot_nfst_sizes_from_csvs(all_csvs, labels, save_path, value='mean')
+    plot_nfst_sizes_from_csvs(all_csvs, labels, save_path, value='median')
+    plot_nfst_sizes_from_csvs(all_csvs, labels, save_path, value='max')
 
     save_path = '/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/'
     losses_plot(root, folders, 'nfst_sizes', save_path)
