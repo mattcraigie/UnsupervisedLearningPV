@@ -192,7 +192,7 @@ def datascaling_plot():
 def nfst_sizes_plot():
     root = "//scratch/smp/uqmcrai4/parity/output/nfst_sizes"
 
-    folders = ['nfst', 'nfst_noinit']
+    folders = ['nfst', 'nfst_noinit', 'nfst_symm']
 
     all_csvs = []
     for folder in folders:
