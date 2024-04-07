@@ -139,7 +139,7 @@ def plot_datascaling_from_csvs(csv_paths, labels, plot_name, value='mean'):
     plt.xlabel('Training Dataset Size')
     fig.text(0.04, 0.5, f'{value.capitalize()} $\\eta$', va='center', rotation='vertical')
 
-    ax1.set_ylim(0, 10)  # Limiting y-axis
+    ax1.set_ylim(-3, 10)  # Limiting y-axis
     ax2.set_ylim(10, 50)  # Limiting y-axis
 
     # Adjust ax1 (bottom subplot) position
@@ -167,7 +167,7 @@ def plot_datascaling_from_csvs(csv_paths, labels, plot_name, value='mean'):
     # Adjusting the bottom spine of ax2 to be a faint dashed grey line
     ax2.spines['bottom'].set_visible(True)  # Ensure the bottom spine is visible
     ax2.spines['bottom'].set_linestyle('--')  # Set the linestyle to dashed
-    ax2.spines['bottom'].set_color('grey')  # Set the color to grey
+    ax2.spines['bottom'].set_color('black')  # Set the color to grey
     ax2.spines['bottom'].set_alpha(0.5)  # Set the transparency for a faint appearance
     ax1.spines['top'].set_visible(False)  # Hide the top spine of the bottom axis
 
