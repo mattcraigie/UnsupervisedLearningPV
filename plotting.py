@@ -93,6 +93,36 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
 
     if 'data_scaling' in csv_paths[0]:
         plt.xlabel('Training Dataset Size')
+
+        # change the yscale so that 0 to 10 takes up the bottom half, and 10 to 50 takes up the top half
+        # this is two linear scales.
+        # Splitting the data at y=10
+        fig, (ax2, ax1) = plt.subplots(2, 1, sharex=True)
+
+        # Plot the lower range data in ax1
+        ax1.plot(x, y, 'r-')
+        ax1.set_ylim(0, 10)  # Limiting y-axis
+
+        # Plot the upper range data in ax2
+        ax2.plot(x, y, 'b-')
+        ax2.set_ylim(10, 50)  # Limiting y-axis
+
+        # Adjust ax1 (bottom subplot) position
+        pos1 = ax1.get_position()  # get the original position of ax1
+        pos2 = ax2.get_position()  # get the original position of ax2
+        height_adjusted = (pos1.height + pos2.height) / 2  # calculate the new height
+
+        # Set new positions
+        pos1_new = [pos1.x0, pos1.y0, pos1.width, height_adjusted]
+        pos2_new = [pos2.x0, pos1.y0 + height_adjusted, pos2.width, height_adjusted]
+
+        ax1.set_position(pos1_new)
+        ax2.set_position(pos2_new)
+
+        # Removing the spines and ticks of the bottom plot of ax2 to clean up the interface
+        ax2.spines['bottom'].set_visible(False)
+        ax2.tick_params(labelbottom=False)
+
     elif 'nfst_sizes' in csv_paths[0]:
         plt.xlabel('Number of Neurons')
 
@@ -105,9 +135,6 @@ def plot_data_from_csvs(csv_paths, labels, plot_name, value='mean'):
 
     # a black line at y=3
     plt.axhline(y=3, color='black', linestyle='--')
-
-    # change the y axis so that it's linear from 0 to 10, then log from 10 to 50
-    # plt.yscale('symlog', linthresh=10)
 
     plt.savefig(f'{plot_name}_{value}.png')
 

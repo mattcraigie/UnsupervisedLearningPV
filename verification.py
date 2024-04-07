@@ -62,7 +62,7 @@ def null_test(model, num_patches, save_dir=None):
         f.write("$\\mu^*$ std: {:.3e}\n".format(parity_violating_means.std().item()))
         f.write("Standard deviations from zero: {:.3e}\n\n".format(pv_std_devs_from_zero.item()))
         f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
-        f.write("K-S test p-value: {:.3e}\n\n")
+        f.write("K-S test p-value: {:.3e}\n\n".format(p_val))
 
     # save the bootstrap and cosmic variance means
     np.save(os.path.join(save_dir, 'null_means.npy'), null_means.squeeze(1).numpy())
@@ -100,11 +100,11 @@ def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
     with open(save_file, 'a') as f:
         f.write("\n\n\n~~~ COSMIC VARIANCE TEST ~~~\n\n")
         f.write("Bootstrap mean: {:.3e}\n".format(bootstrap_means.mean().item()))
-        f.write("Bootstrap std: {:.3e}\n\n")
+        f.write("Bootstrap std: {:.3e}\n\n".format(bootstrap_means.std().item()))
         f.write("Cosmic variance mean: {:.3e}\n".format(all_universe_means.mean().item()))
-        f.write("Cosmic variance std: {:.3e}\n\n")
+        f.write("Cosmic variance std: {:.3e}\n\n".format(all_universe_means.std().item()))
         f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
-        f.write("K-S test p-value: {:.3e}\n\n")
+        f.write("K-S test p-value: {:.3e}\n\n".format(p_val))
 
     # save the bootstrap and cosmic variance means
     np.save(os.path.join(save_dir, 'bootstrap_means.npy'), bootstrap_means.squeeze(1).numpy())
