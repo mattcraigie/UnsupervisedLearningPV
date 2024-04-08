@@ -100,6 +100,7 @@ def compare_filters(model, save_dir):
 
 
 def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_dir):
+    print('hello?')
     num_scales = len(filt_final)
 
     fig, axes = plt.subplots(nrows=1, ncols=num_scales, figsize=(9, 9), dpi=100)
