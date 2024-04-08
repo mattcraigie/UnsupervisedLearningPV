@@ -113,7 +113,7 @@ def plot_fourier_transform_of_fourier_difference(filters_final, filters_initial,
         filt_initial = filters_initial[j][0].cpu().detach()
         filt_difference = filt_final - filt_initial
 
-        average_diffs.append(filt_difference.abs().mean().item())
+        average_diffs.append(filt_difference.abs().mean().item() / filt_initial.abs().mean().item())
 
         ft_of_diff = torch.fft.fft2(filt_difference)
         ft_of_diff[0, 0] = 0
