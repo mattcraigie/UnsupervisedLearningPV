@@ -164,12 +164,15 @@ def plot_datascaling_from_csvs(csv_paths, labels, plot_name, value='mean'):
     # a black line at y=3
     plt.axhline(y=3, color='black', linestyle='--')
 
-    # Adjusting the bottom spine of ax2 to be a faint dashed grey line
-    ax2.spines['bottom'].set_visible(True)  # Ensure the bottom spine is visible
-    ax2.spines['bottom'].set_linestyle('--')  # Set the linestyle to dashed
-    ax2.spines['bottom'].set_color('black')  # Set the color to grey
-    ax2.spines['bottom'].set_alpha(0.5)  # Set the transparency for a faint appearance
-    ax1.spines['top'].set_visible(False)  # Hide the top spine of the bottom axis
+    ax1.spines['top'].set_linestyle(':')  # Set the linestyle to dashed
+    ax1.spines['top'].set_color('black')  # Set the color to grey
+    ax1.spines['top'].set_alpha(0.3)  # Set the transparency for a faint appearance
+
+    ax1.set_yticks([-4, -2, 0, 2, 4, 6, 8, 10])
+    ax1.set_yticklabels(['', -2, '', 2, '', 6, '', 10])
+
+    ax2.set_yticks([20, 30, 40, 50, 60, 70, 80, 90])
+    ax2.set_yticklabels(['', 30, '', 50, '', 70, '', 90])
 
     plt.savefig(f'{plot_name}_{value}.png')
 
