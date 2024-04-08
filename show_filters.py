@@ -101,13 +101,16 @@ def compare_filters(model, save_dir):
 
 
 def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_dir):
-    print('hello?')
     num_scales = len(filt_final)
 
     fig, axes = plt.subplots(nrows=1, ncols=num_scales, figsize=(9, 9), dpi=100)
 
+    average_diffs = []
+
     for j in range(num_scales):
         filt_difference = filt_final[j][0].cpu().detach() - filt_initial[j][0].cpu().detach()
+        average_diffs.append(filt_difference.abs().mean() / filt_initial[j][0].abs().mean())
+
         ft_of_diff = torch.fft.fft2(filt_difference)
         ft_of_diff[0, 0] = 0
 
@@ -116,6 +119,9 @@ def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_
     for ax in axes.flatten():
         ax.set_xticks([])
         ax.set_yticks([])
+
+    print('Average diffs: ', average_diffs)
+    print('Mean over filters: ', np.mean(average_diffs))
 
     plt.suptitle('Fourier Transform of Fourier Difference')
     plt.savefig(os.path.join(save_dir, 'fourier_transform_of_fourier_difference.png'))
