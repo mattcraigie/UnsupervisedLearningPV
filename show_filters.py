@@ -109,8 +109,9 @@ def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_
     for j in range(num_scales):
         filt_difference = filt_final[j][0].cpu().detach() - filt_initial[j][0].cpu().detach()
         ft_of_diff = torch.fft.fft2(filt_difference)
+        ft_of_diff[0, 0] = 0
 
-        axes[j].imshow(np.abs(ft_of_diff))
+        axes[j].imshow(np.fft.fftshift(np.abs(ft_of_diff)))
 
     for ax in axes.flatten():
         ax.set_xticks([])
