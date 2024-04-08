@@ -184,6 +184,7 @@ def plot_histograms(save_dir):
     plt.suptitle("Parity Violation Detection Model Verification")
     plt.savefig(os.path.join(save_dir, 'null_histograms.png'))
 
+
     # COSMIC VARIANCE TEST
 
     # load the means
@@ -214,6 +215,38 @@ def plot_histograms(save_dir):
 
     plt.suptitle("Cosmic Variance Verification")
     plt.savefig(os.path.join(save_dir, 'cosmic_variance_histograms.png'))
+
+
+    # NULL COSMIC VARIANCE TEST
+
+    # load the means
+    bootstrap_means = np.load(os.path.join(save_dir, 'parity_violating_means.npy')) #np.load(os.path.join(save_dir, 'bootstrap_means.npy'))
+    null_all_universe_means = np.load(os.path.join(save_dir, 'null_all_universe_means.npy'))
+
+    # plot the two distributions
+    fig, axes = plt.subplots(ncols=2, figsize=(12, 5))
+    axes[0].hist(bootstrap_means, bins=50, alpha=0.6, label="Single Survey Bootstrapped Means ($\\mu^*$)")
+    counts, bins = np.histogram(null_all_universe_means, bins=50)
+    axes[0].stairs(counts, bins, label='Null Cosmic Variance Means ($\\mu_0^\\star$)', linewidth=2, ec='maroon')
+
+    # axes[0].hist(a, bins=50, alpha=0.5, label="$\\mu_0^*$", color='black')
+    # axes[0].axvline(0, color='black', linestyle='--')
+    axes[0].set_xlabel("Means")
+    axes[0].set_ylabel("Frequency")
+    axes[0].legend()
+
+    # plot the shifted distributions
+    shifted_bootstrap_means = bootstrap_means - bootstrap_means.mean()
+    shifted_null_all_universe_means = null_all_universe_means - null_all_universe_means.mean()
+
+    axes[1].hist(shifted_bootstrap_means, bins=50, alpha=0.6, label="Centred $\\mu^*$")
+    counts, bins = np.histogram(shifted_null_all_universe_means, bins=50)
+    axes[1].stairs(counts, bins, label='Centred $\\mu_0^\\star$', linewidth=2, ec='maroon')
+    axes[1].legend()
+    axes[1].set_xlabel("Shifted Means")
+
+    plt.suptitle("Null Cosmic Variance Verification")
+    plt.savefig(os.path.join(save_dir, 'null_cosmic_variance_histograms.png'))
 
 
 if __name__ == '__main__':
