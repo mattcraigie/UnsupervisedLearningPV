@@ -97,6 +97,27 @@ def compare_filters(model, save_dir):
                                 'filters_x_imag.png')
 
 
+def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_dir):
+    num_scales = len(filt_final)
+
+    fig, axes = plt.subplots(nrows=1, ncols=num_scales, figsize=(9, 9), dpi=100)
+
+    for j in range(num_scales):
+        filt_difference = filt_final[j] - filt_initial[j]
+        ft_of_diff = torch.fft.fft2(filt_difference)
+
+        # max_abs_value = max(abs(filt_difference.min()), abs(filt_difference.max()))
+        # norm_difference = Normalize(vmin=-max_abs_value, vmax=max_abs_value)
+
+        axes[j].imshow(ft_of_diff)
+
+    for ax in axes.flatten():
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    plt.suptitle('Fourier Transform of Fourier Difference')
+    plt.savefig(os.path.join(save_dir, 'fourier_transform_of_fourier_difference.png'))
+
 def show_filters(model, save_dir, morlet_diff=False):
 
     num_scales = model.filters.num_scales
