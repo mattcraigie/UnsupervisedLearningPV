@@ -110,6 +110,46 @@ def cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
     np.save(os.path.join(save_dir, 'bootstrap_means.npy'), bootstrap_means.squeeze(1).numpy())
     np.save(os.path.join(save_dir, 'all_universe_means.npy'), all_universe_means.numpy())
 
+def null_cosmic_variance_test(model, num_patches, num_universes, save_dir=None):
+
+    # create the bootstrapped distribution
+    bootstrap_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 1, 4, 8)
+    bootstrap_dataset = TensorDataset(torch.from_numpy(bootstrap_data).unsqueeze(1).float())
+    bootstrap_dataloader = DataLoader(bootstrap_dataset, batch_size=64, shuffle=False)
+
+    bootstrap_means = get_bootstrap_means(model, bootstrap_dataloader, num_bootstraps=10000)
+
+    # create the cosmic variance distribution
+    all_universe_means = []
+    for i in range(num_universes):
+        universe_data = create_parity_violating_mocks_2d(num_patches, 32, 16, 0.5, 4, 8)
+        universe_dataset = TensorDataset(torch.from_numpy(universe_data).unsqueeze(1).float())
+        universe_dataloader = DataLoader(universe_dataset, batch_size=64, shuffle=False)
+
+        universe_mean = get_diffs(model, universe_dataloader).mean()
+        all_universe_means.append(universe_mean)
+
+    all_universe_means = torch.stack(all_universe_means)
+
+    # check that these means come from the same distribution with a K-S test
+    shifted_bootstrap_means = (bootstrap_means - bootstrap_means.mean()).squeeze(1).numpy()
+    shifted_all_universe_means = (all_universe_means - all_universe_means.mean()).numpy()
+    ks_stat, p_val = stats.ks_2samp(shifted_bootstrap_means, shifted_all_universe_means)
+
+    save_file = os.path.join(save_dir, 'null_cosmic_variance_test_results.txt')
+    with open(save_file, 'a') as f:
+        f.write("\n\n\n~~~ NULL COSMIC VARIANCE TEST ~~~\n\n")
+        f.write("Bootstrap mean: {:.3e}\n".format(bootstrap_means.mean().item()))
+        f.write("Bootstrap std: {:.3e}\n\n".format(bootstrap_means.std().item()))
+        f.write("Cosmic variance mean: {:.3e}\n".format(all_universe_means.mean().item()))
+        f.write("Cosmic variance std: {:.3e}\n\n".format(all_universe_means.std().item()))
+        f.write("K-S test statistic: {:.3e}\n".format(ks_stat))
+        f.write("K-S test p-value: {:.3e}\n\n".format(p_val))
+
+    # save the bootstrap and cosmic variance means
+    # np.save(os.path.join(save_dir, 'bootstrap_means.npy'), bootstrap_means.squeeze(1).numpy())
+    np.save(os.path.join(save_dir, 'null_all_universe_means.npy'), all_universe_means.numpy())
+
 
 def plot_histograms(save_dir):
 
@@ -216,11 +256,14 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(args.model_save_path))
         model.to(torch.device("cuda"))
 
-        # Run the null test
-        null_test(model, args.num_patches, args.save_dir)
+        # Run the null bootstrap test
+        # null_test(model, args.num_patches, args.save_dir)
 
         # Run the cosmic variance test
-        cosmic_variance_test(model, args.num_patches, args.num_universes, args.save_dir)
+        # cosmic_variance_test(model, args.num_patches, args.num_universes, args.save_dir)
+
+        # Run the null cosmic variance test
+        null_cosmic_variance_test(model, args.num_patches, args.num_universes, args.save_dir)
 
     # plot the histograms
     plot_histograms(args.save_dir)
