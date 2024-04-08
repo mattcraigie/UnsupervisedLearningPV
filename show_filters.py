@@ -6,6 +6,7 @@ from scattering_transform.filters import ClippedMorlet
 from models import NFSTRegressor
 import yaml
 import argparse
+import numpy as np
 
 
 def plot_filter_transformations(filters_final, filters_initial, save_dir, transform_fn, title, file_name):
@@ -109,10 +110,7 @@ def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_
         filt_difference = filt_final[j].cpu().detach() - filt_initial[j].cpu().detach()
         ft_of_diff = torch.fft.fft2(filt_difference)
 
-        # max_abs_value = max(abs(filt_difference.min()), abs(filt_difference.max()))
-        # norm_difference = Normalize(vmin=-max_abs_value, vmax=max_abs_value)
-
-        axes[j].imshow(ft_of_diff)
+        axes[j].imshow(np.abs(ft_of_diff))
 
     for ax in axes.flatten():
         ax.set_xticks([])
