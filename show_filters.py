@@ -96,6 +96,8 @@ def compare_filters(model, save_dir):
                                 'NFST Learned Filters: Configuration Space Imaginary Part',
                                 'filters_x_imag.png')
 
+    plot_fourier_transform_of_fourier_difference(filters_final, filters_initial, save_dir)
+
 
 def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_dir):
     num_scales = len(filt_final)
