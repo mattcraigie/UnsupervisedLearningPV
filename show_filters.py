@@ -107,7 +107,7 @@ def plot_fourier_transform_of_fourier_difference(filt_final, filt_initial, save_
     fig, axes = plt.subplots(nrows=1, ncols=num_scales, figsize=(9, 9), dpi=100)
 
     for j in range(num_scales):
-        filt_difference = filt_final[j].cpu().detach() - filt_initial[j].cpu().detach()
+        filt_difference = filt_final[j][0].cpu().detach() - filt_initial[j][0].cpu().detach()
         ft_of_diff = torch.fft.fft2(filt_difference)
 
         axes[j].imshow(np.abs(ft_of_diff))
