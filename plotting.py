@@ -273,7 +273,7 @@ def verification_plot(root, techniques, test_type, save_dir, colours=None):
 
 def plot_toy_data_patches():
 
-    for i in range(10):
+    for repeat in range(10):
         mocks = create_parity_violating_mocks_2d(3, 32, 15, 1, 4, 8)
         single_blue = create_parity_violating_mocks_2d(3, 32, 1, 1, 4, 8)
 
@@ -293,7 +293,7 @@ def plot_toy_data_patches():
             ax.set_yticks([])
 
         plt.tight_layout()
-        plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/toy_data_patches_{}.png'.format(i))
+        plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/toy_data_patches_{}.png'.format(repeat))
         plt.close()
 
 
