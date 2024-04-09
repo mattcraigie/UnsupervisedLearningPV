@@ -337,7 +337,7 @@ def plot_morlet_filters():
     x = torch.fft.fftshift(torch.fft.fft2(k))
     k = torch.fft.fftshift(k)
 
-    fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
+    fig, axes = plt.subplots(ncols=3, figsize=(12, 5), dpi=300)
 
     axes[0].imshow(k)
     axes[1].imshow(x.real)
