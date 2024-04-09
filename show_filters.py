@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
         config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
 
-        all_repeats = os.listdir(current_read_folder)
+        all_repeats = np.sort(os.listdir(current_read_folder))
 
         for repeat in all_repeats:
 
