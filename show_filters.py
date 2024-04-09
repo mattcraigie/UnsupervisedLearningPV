@@ -7,6 +7,7 @@ from models import NFSTRegressor
 import yaml
 import argparse
 import numpy as np
+import pandas as pd
 
 
 def plot_filter_transformations(filters_final, filters_initial, save_dir, transform_fn, title, file_name):
@@ -55,56 +56,10 @@ def plot_filter_transformations(filters_final, filters_initial, save_dir, transf
     plt.savefig(os.path.join(save_dir, file_name))
 
 
-def compare_filters(model, save_dir):
-    # Fourier space transformation (no change)
-    def fourier_real_transform(filter_tensor):
-        return torch.fft.fftshift(filter_tensor)
-
-    # Configuration space magnitude (no change)
-    def config_abs_transform(filter_tensor):
-        return torch.fft.fftshift(torch.fft.fft2(filter_tensor).abs())
-
-    # Configuration space real part
-    def config_real_transform(filter_tensor):
-        return torch.fft.fftshift(torch.fft.fft2(filter_tensor).real)
-
-    # Configuration space imaginary part
-    def config_imaginary_transform(filter_tensor):
-        return torch.fft.fftshift(torch.fft.fft2(filter_tensor).imag)
-
-    filters_final = [filt.clone() for filt in model.filters.filters]
-    model.filters.load_state_dict(model.initial_filters_state)
-    model.filters.update_filters()
-    filters_initial = model.filters.filters
-
-    # Plot in Fourier space
-    plot_filter_transformations(filters_final, filters_initial, save_dir, fourier_real_transform,
-                                'NFST Learned Filters: Fourier Space Real Part',
-                                'filters_k.png')
-
-    # Plot in Configuration space (Magnitude)
-    plot_filter_transformations(filters_final, filters_initial, save_dir, config_abs_transform,
-                                'NFST Learned Filters: Configuration Space Magnitudes',
-                                'filters_x_abs.png')
-
-    # Plot in Configuration space (Real Part)
-    plot_filter_transformations(filters_final, filters_initial, save_dir, config_real_transform,
-                                'NFST Learned Filters: Configuration Space Real Part',
-                                'filters_x_real.png')
-
-    # Plot in Configuration space (Imaginary Part)
-    plot_filter_transformations(filters_final, filters_initial, save_dir, config_imaginary_transform,
-                                'NFST Learned Filters: Configuration Space Imaginary Part',
-                                'filters_x_imag.png')
-
-    plot_fourier_transform_of_fourier_difference(filters_final, filters_initial, save_dir)
-
-
-def plot_fourier_transform_of_fourier_difference(filters_final, filters_initial, save_dir):
+def final_filters_plot(filters_final, filters_initial, save_path, nfn_width):
     num_scales = len(filters_final)
 
-
-    fig, axes = plt.subplots(nrows=1, ncols=num_scales, figsize=(9, 9), dpi=100)
+    fig, axes = plt.subplots(nrows=3, ncols=num_scales, figsize=(9, 9), dpi=100)
 
     average_diffs = []
 
@@ -112,64 +67,39 @@ def plot_fourier_transform_of_fourier_difference(filters_final, filters_initial,
         filt_final = filters_final[j][0].cpu().detach()
         filt_initial = filters_initial[j][0].cpu().detach()
         filt_difference = filt_final - filt_initial
-
-        average_diffs.append(filt_difference.abs().mean().item() / filt_initial.abs().mean().item())
+        max_abs_value = max(abs(filt_difference.min()), abs(filt_difference.max()))
+        norm_difference = Normalize(vmin=-max_abs_value, vmax=max_abs_value)
 
         ft_of_diff = torch.fft.fft2(filt_difference)
         ft_of_diff[0, 0] = 0
 
-        axes[j].imshow(np.fft.fftshift(np.abs(ft_of_diff)))
+        axes[1, 0].imshow(filt_final)
+        axes[1, 0].imshow(filt_difference, norm=norm_difference, cmap='bwr')
+        axes[2, j].imshow(np.fft.fftshift(np.abs(ft_of_diff)))
+
+        average_diffs.append(filt_difference.abs().mean().item() / filt_initial.abs().mean().item())
 
     for ax in axes.flatten():
         ax.set_xticks([])
         ax.set_yticks([])
 
+    axes[0, 0].set_ylabel('Learned Filter', fontsize=14)
+    axes[1, 0].set_ylabel('Difference from\nMorlet Initialisation', fontsize=14)
+    axes[2, 0].set_ylabel('Inverse Fourier Transform of\nDifference From\nMorlet Initialisation', fontsize=14)
+
+    for i in range(num_scales):
+        axes[0, i].set_title(f'$j={i}$')
+
+    plt.suptitle("Neural Field Filters of NFST Model with NFN width {}".format(nfn_width))
+
     print('Average diffs: ', average_diffs)
     print('Mean over filters: ', np.mean(average_diffs))
 
-    plt.suptitle('Fourier Transform of Fourier Difference')
-    plt.savefig(os.path.join(save_dir, 'fourier_transform_of_fourier_difference.png'))
+    plt.savefig(save_path)
 
-def show_filters(model, save_dir, morlet_diff=False):
 
-    num_scales = model.filters.num_scales
-    num_angles = model.filters.num_angles
+    # NEXT: MAKE THIS RUN FOR ALL THE MODELS IN THE FOLDER
 
-    morlet_reference = ClippedMorlet(32, num_scales, num_angles)
-    morlet_reference.clip_filters()
-
-    fig, axes = plt.subplots(nrows=num_scales, ncols=4, figsize=(12, 9), dpi=100)
-    filts = model.filters.filters
-
-    for j in range(num_scales):
-
-        filt_k = filts[j][0]
-        filt_x = torch.fft.fft2(filt_k)
-
-        filt_x = torch.fft.fftshift(filt_x).detach()
-        filt_k = torch.fft.fftshift(filt_k).detach()
-
-        if not morlet_diff:
-            axes[j, 0].imshow(filt_k)
-            axes[j, 1].imshow(filt_x.real)
-            axes[j, 2].imshow(filt_x.imag)
-            axes[j, 3].imshow(filt_x.abs())
-
-        else:
-            base_k = morlet_reference.filters[j][3]
-            base_x = torch.fft.fft2(base_k)
-            base_x = torch.fft.fftshift(base_x).detach()
-            base_k = torch.fft.fftshift(base_k).detach()
-
-            axes[j, 0].imshow(filt_k - base_k)
-            axes[j, 1].imshow(filt_x.real - base_x.real)
-            axes[j, 2].imshow(filt_x.imag - base_x.imag)
-            axes[j, 3].imshow(filt_x.abs() - base_x.abs())
-
-        for a in range(4):
-            axes[j, a].set_axis_off()
-
-    plt.savefig(os.path.join(save_dir, 'filters.png'))
 
 
 if __name__ == '__main__':
@@ -180,7 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model_save_path', type=str, required=True)
     parser.add_argument('-c', '--config_path', type=str, required=True)
     parser.add_argument('-s', '--save_dir', type=str, required=True)
-    parser.add_argument('-n', '--num_neurons', type=int, default=256, required=False)
+    # parser.add_argument('-n', '--num_neurons', type=int, default=256, required=False)
 
     args = parser.parse_args()
 
@@ -189,13 +119,37 @@ if __name__ == '__main__':
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
-    if args.num_neurons is not None:
-        config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [args.num_neurons, args.num_neurons]
+    all_folders = os.listdir(args.save_dir)  # not all are folders
+    all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.save_dir, folder))]
 
-    model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
-    model.load_state_dict(torch.load(args.model_save_path))
+    all_nfst_sizes = pd.read_csv(os.path.join(args.save_dir, 'summary.csv'), header=None)[0].values
 
-    # show filters
-    compare_filters(model, args.save_dir)
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
+
+    for folder, nfst_size in zip(all_folders, all_nfst_sizes):
+
+        if not os.path.exists(os.path.join(args.save_dir, folder)):
+            os.makedirs(os.path.join(args.save_dir, folder))
+
+        config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
+
+        all_repeats = os.listdir(args.save_dir)
+
+        for repeat in all_repeats:
+
+            model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
+            model.load_state_dict(torch.load(os.path.join(args.save_dir, folder, repeat, 'model.pth')))
+
+            filters_final = [filt.clone() for filt in model.filters.filters]
+            model.filters.load_state_dict(model.initial_filters_state)
+            model.filters.update_filters()
+            filters_initial = model.filters.filters
+
+            out_file = os.path.join(args.save_dir, folder, repeat + '_filters.png')
+
+            final_filters_plot(filters_final, filters_initial, out_file, nfst_size)
+
+
 
 
