@@ -122,7 +122,7 @@ if __name__ == '__main__':
     all_folders = np.sort(os.listdir(args.model_save_path))  # not all are folders
     all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.model_save_path, folder))]
 
-    all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values[1:]
+    all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values.astype(int)[1:]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
