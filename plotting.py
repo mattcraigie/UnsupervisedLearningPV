@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import argparse
 from mocks import *
+from scattering_transform.filters import ClippedMorlet, Morlet
 
 def losses_plot(root, techniques, test_type, save_dir):
 
@@ -328,7 +329,12 @@ def plot_single_triangle():
 
 def plot_morlet_filters():
 
+    size, J, L = 32, 3, 8
+    morlet = ClippedMorlet()
+
     fig, axes = plt.subplots(ncols=3)
+
+
 
 
 if __name__ == '__main__':

@@ -122,8 +122,8 @@ if __name__ == '__main__':
     all_folders = os.listdir(args.model_save_path)  # not all are folders
     all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.model_save_path, folder))]
 
-    all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values
-    print(all_nfst_sizes)
+    all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values[1:]
+
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
@@ -134,7 +134,6 @@ if __name__ == '__main__':
         if not os.path.exists(current_output_folder):
             os.makedirs(current_output_folder)
 
-        print(nfst_size)
         config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
 
         all_repeats = os.listdir(current_read_folder)
