@@ -333,7 +333,7 @@ def plot_morlet_filters():
     size, J, L = 32, 3, 8
     morlet = ClippedMorlet(size, J, L)
 
-    k = morlet.filters[1][2]
+    k = morlet.filters[1][-1]
     x = torch.fft.fftshift(torch.fft.fft2(k))
     k = torch.fft.fftshift(k)
 
