@@ -348,6 +348,10 @@ def plot_morlet_filters():
         ax.set_yticks([])
     plt.tight_layout()
 
+    axes[0].set_title("Fourier Space\n Real", fontsize=16)
+    axes[1].set_title("Configuration Space\nReal", fontsize=16)
+    axes[2].set_title("Configuration Space\nImag", fontsize=16)
+
     plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/morlet_filters.png')
 
 
