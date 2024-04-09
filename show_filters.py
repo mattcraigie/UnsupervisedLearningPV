@@ -57,7 +57,7 @@ def plot_filter_transformations(filters_final, filters_initial, save_dir, transf
     plt.savefig(os.path.join(save_dir, file_name))
 
 
-def final_filters_plot(filters_final, filters_initial, save_path, nfn_width):
+def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_width, score):
     num_scales = len(filters_final)
 
     fig, axes = plt.subplots(nrows=3, ncols=num_scales, figsize=(9, 9), dpi=100)
@@ -74,8 +74,8 @@ def final_filters_plot(filters_final, filters_initial, save_path, nfn_width):
         ft_of_diff = torch.fft.fft2(filt_difference)
         ft_of_diff[0, 0] = 0
 
-        axes[1, 0].imshow(filt_final)
-        axes[1, 0].imshow(filt_difference, norm=norm_difference, cmap='bwr')
+        axes[0, j].imshow(filt_final)
+        axes[1, j].imshow(filt_difference, norm=norm_difference, cmap='bwr')
         axes[2, j].imshow(np.fft.fftshift(np.abs(ft_of_diff)))
 
         average_diffs.append(filt_difference.abs().mean().item() / filt_initial.abs().mean().item())
@@ -91,7 +91,7 @@ def final_filters_plot(filters_final, filters_initial, save_path, nfn_width):
     for i in range(num_scales):
         axes[0, i].set_title(f'$j={i}$')
 
-    plt.suptitle("Neural Field Filters of NFST Model with NFN width {}".format(nfn_width))
+    plt.suptitle("NFN width {}, repeat {}, score {}".format(nfn_width, repeat, score))
 
     print('Average diffs: ', average_diffs)
     print('Mean over filters: ', np.mean(average_diffs))
@@ -123,26 +123,26 @@ if __name__ == '__main__':
     all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.model_save_path, folder))]
 
     all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values.astype(int)[1:]
+    all_test_results = np.read('test_scores.npy')
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
-    for folder, nfst_size in zip(all_folders, all_nfst_sizes):
+    for i in range(len(all_folders)):
+        folder = all_folders[i]
+        nfst_size = all_nfst_sizes[i]
 
         current_read_folder = os.path.join(args.model_save_path, folder)
         current_output_folder = os.path.join(args.save_dir, folder)
         if not os.path.exists(current_output_folder):
             os.makedirs(current_output_folder)
 
-
-        print(nfst_size)
         config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
 
         all_repeats = np.sort(os.listdir(current_read_folder))
 
-        for repeat in all_repeats:
-            print(folder)
-            print(config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'])
+        for j, repeat in enumerate(all_repeats):
+
             model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
             model.load_state_dict(torch.load(os.path.join(current_read_folder, repeat, 'model.pt')))
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
             out_file = os.path.join(current_output_folder, repeat + '_filters.png')
 
-            final_filters_plot(filters_final, filters_initial, out_file, nfst_size)
+            final_filters_plot(filters_final, filters_initial, out_file, j, nfst_size, all_test_results[i, j])
 
     # tar gzip the entire folder
     shutil.make_archive(args.save_dir, 'gztar', args.save_dir)
