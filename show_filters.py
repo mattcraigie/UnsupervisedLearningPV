@@ -116,8 +116,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # load config yaml
-    config_path = os.path.join(args.config_path)
-    with open(config_path, 'r') as f:
+    with open(args.config_path, 'r') as f:
         config = yaml.safe_load(f)
 
     all_folders = os.listdir(args.model_save_path)  # not all are folders
@@ -130,25 +129,26 @@ if __name__ == '__main__':
 
     for folder, nfst_size in zip(all_folders, all_nfst_sizes):
 
-        current_folder = os.path.join(args.model_save_path, folder)
-        if not os.path.exists(current_folder):
-            os.makedirs(current_folder)
+        current_read_folder = os.path.join(args.model_save_path, folder)
+        current_output_folder = os.path.join(args.save_dir, folder)
+        if not os.path.exists(current_output_folder):
+            os.makedirs(current_output_folder)
 
         config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
 
-        all_repeats = os.listdir(current_folder)
+        all_repeats = os.listdir(current_read_folder)
 
         for repeat in all_repeats:
 
             model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
-            model.load_state_dict(torch.load(os.path.join(current_folder, repeat, 'model.pth')))
+            model.load_state_dict(torch.load(os.path.join(current_read_folder, repeat, 'model.pth')))
 
             filters_final = [filt.clone() for filt in model.filters.filters]
             model.filters.load_state_dict(model.initial_filters_state)
             model.filters.update_filters()
             filters_initial = model.filters.filters
 
-            out_file = os.path.join(args.save_dir, folder, repeat + '_filters.png')
+            out_file = os.path.join(current_output_folder, repeat + '_filters.png')
 
             final_filters_plot(filters_final, filters_initial, out_file, nfst_size)
 
