@@ -248,6 +248,18 @@ def plot_histograms(save_dir):
     plt.suptitle("Null Cosmic Variance Verification")
     plt.savefig(os.path.join(save_dir, 'null_cosmic_variance_histograms.png'))
 
+    print("Normality Test")
+
+    # normalise first
+    bootstrap_means = (bootstrap_means - bootstrap_means.mean()) / bootstrap_means.std()
+    all_universe_means = (all_universe_means - all_universe_means.mean()) / all_universe_means.std()
+    null_all_universe_means = (null_all_universe_means - null_all_universe_means.mean()) / null_all_universe_means.std()
+
+    print("Bootstrap Means: {:.3e}".format(stats.normaltest(bootstrap_means)[1]))
+    print("All Universe Means: {:.3e}".format(stats.normaltest(all_universe_means)[1]))
+    print("Null All Universe Means: {:.3e}".format(stats.normaltest(null_all_universe_means)[1]))
+
+
 
 if __name__ == '__main__':
 
