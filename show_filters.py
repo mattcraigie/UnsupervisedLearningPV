@@ -123,7 +123,7 @@ if __name__ == '__main__':
     all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.model_save_path, folder))]
 
     all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values.astype(int)[1:]
-    all_test_results = np.load('test_scores.npy')
+    all_test_results = np.load(os.path.join(args.model_save_path, 'test_scores.npy'))
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
