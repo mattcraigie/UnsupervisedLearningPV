@@ -326,6 +326,11 @@ def plot_single_triangle():
     plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/single_triangle.png')
 
 
+def plot_morlet_filters():
+
+    fig, axes = plt.subplots(ncols=3)
+
+
 if __name__ == '__main__':
 
     datascaling_plot()
