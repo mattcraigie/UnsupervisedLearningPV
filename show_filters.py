@@ -120,27 +120,28 @@ if __name__ == '__main__':
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
-    all_folders = os.listdir(args.save_dir)  # not all are folders
-    all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.save_dir, folder))]
+    all_folders = os.listdir(args.model_save_path)  # not all are folders
+    all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.model_save_path, folder))]
 
-    all_nfst_sizes = pd.read_csv(os.path.join(args.save_dir, 'summary.csv'), header=None)[0].values
+    all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
     for folder, nfst_size in zip(all_folders, all_nfst_sizes):
 
-        if not os.path.exists(os.path.join(args.save_dir, folder)):
-            os.makedirs(os.path.join(args.save_dir, folder))
+        current_folder = os.path.join(args.model_save_path, folder)
+        if not os.path.exists(current_folder):
+            os.makedirs(current_folder)
 
         config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
 
-        all_repeats = os.listdir(args.save_dir)
+        all_repeats = os.listdir(current_folder)
 
         for repeat in all_repeats:
 
             model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
-            model.load_state_dict(torch.load(os.path.join(args.save_dir, folder, repeat, 'model.pth')))
+            model.load_state_dict(torch.load(os.path.join(current_folder, repeat, 'model.pth')))
 
             filters_final = [filt.clone() for filt in model.filters.filters]
             model.filters.load_state_dict(model.initial_filters_state)
