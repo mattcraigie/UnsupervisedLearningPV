@@ -8,6 +8,7 @@ import yaml
 import argparse
 import numpy as np
 import pandas as pd
+import shutil
 
 
 def plot_filter_transformations(filters_final, filters_initial, save_dir, transform_fn, title, file_name):
@@ -149,6 +150,9 @@ if __name__ == '__main__':
             out_file = os.path.join(args.save_dir, folder, repeat + '_filters.png')
 
             final_filters_plot(filters_final, filters_initial, out_file, nfst_size)
+
+    # tar gzip the entire folder
+    shutil.make_archive(args.save_dir, 'gztar', args.save_dir)
 
 
 
