@@ -334,17 +334,21 @@ def plot_morlet_filters():
     morlet = ClippedMorlet(size, J, L)
 
     k = morlet.filters[0][0]
-    x = torch.fft.fft2()
+    x = torch.fft.fftshift(torch.fft.fft2(k))
+    k = torch.fft.fftshift(k)
 
+    fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
 
-    fig, axes = plt.subplots(ncols=3)
-
-    axes[0].imshow(filts)
+    axes[0].imshow(k)
+    axes[1].imshow(x.real)
+    axes[2].imshow(x.imag)
 
     for ax in axes.flatten():
         ax.set_xticks([])
         ax.set_yticks([])
+    plt.tight_layout()
 
+    plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/morlet_filters.png')
 
 
 if __name__ == '__main__':

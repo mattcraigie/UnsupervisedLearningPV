@@ -97,7 +97,7 @@ def final_filters_plot(filters_final, filters_initial, save_path, nfn_width):
     print('Mean over filters: ', np.mean(average_diffs))
 
     plt.savefig(save_path)
-
+    plt.close()
 
     # NEXT: MAKE THIS RUN FOR ALL THE MODELS IN THE FOLDER
 
