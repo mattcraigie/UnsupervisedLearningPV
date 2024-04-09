@@ -356,6 +356,7 @@ if __name__ == '__main__':
     datascaling_plot()
     nfst_sizes_plot()
     plot_toy_data_patches()
+    plot_morlet_filters()
 
     # # parse arguments for plotting
     # parser = argparse.ArgumentParser()
