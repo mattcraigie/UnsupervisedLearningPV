@@ -74,9 +74,9 @@ def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_wi
         ft_of_diff = torch.fft.fft2(filt_difference)
         ft_of_diff[0, 0] = 0
 
-        axes[0, j].imshow(filt_final)
-        axes[1, j].imshow(filt_difference, norm=norm_difference, cmap='bwr')
-        axes[2, j].imshow(np.fft.fftshift(np.abs(ft_of_diff)))
+        axes[0, j].imshow(torch.fft.fftshift(filt_final))
+        axes[1, j].imshow(torch.fft.fftshift(filt_difference), norm=norm_difference, cmap='bwr')
+        axes[2, j].imshow(torch.fft.fftshift(torch.abs(ft_of_diff)))
 
         average_diffs.append(filt_difference.abs().mean().item() / filt_initial.abs().mean().item())
 
