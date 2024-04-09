@@ -119,7 +119,7 @@ if __name__ == '__main__':
     with open(args.config_path, 'r') as f:
         config = yaml.safe_load(f)
 
-    all_folders = os.listdir(args.model_save_path)  # not all are folders
+    all_folders = np.sort(os.listdir(args.model_save_path))  # not all are folders
     all_folders = [folder for folder in all_folders if os.path.isdir(os.path.join(args.model_save_path, folder))]
 
     all_nfst_sizes = pd.read_csv(os.path.join(args.model_save_path, 'summary.csv'), header=None)[0].values[1:]
@@ -134,12 +134,15 @@ if __name__ == '__main__':
         if not os.path.exists(current_output_folder):
             os.makedirs(current_output_folder)
 
+
+        print(nfst_size)
         config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'] = [nfst_size, nfst_size]
 
         all_repeats = np.sort(os.listdir(current_read_folder))
 
         for repeat in all_repeats:
-
+            print(folder)
+            print(config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'])
             model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
             model.load_state_dict(torch.load(os.path.join(current_read_folder, repeat, 'model.pth')))
 

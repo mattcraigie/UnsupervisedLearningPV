@@ -330,10 +330,19 @@ def plot_single_triangle():
 def plot_morlet_filters():
 
     size, J, L = 32, 3, 8
-    morlet = ClippedMorlet()
+    morlet = ClippedMorlet(size, J, L)
+
+    k = morlet.filters[0][0]
+    x_real =
+
 
     fig, axes = plt.subplots(ncols=3)
 
+    axes[0].imshow(filts)
+
+    for ax in axes.flatten():
+        ax.set_xticks([])
+        ax.set_yticks([])
 
 
 
