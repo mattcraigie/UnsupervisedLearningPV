@@ -86,12 +86,12 @@ def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_wi
 
     axes[0, 0].set_ylabel('Learned Filter', fontsize=14)
     axes[1, 0].set_ylabel('Difference from\nMorlet Initialisation', fontsize=14)
-    axes[2, 0].set_ylabel('Inverse Fourier Transform of\nDifference From\nMorlet Initialisation', fontsize=14)
+    axes[2, 0].set_ylabel('Inverse Fourier Transform\nof Difference From\nMorlet Initialisation', fontsize=14)
 
     for i in range(num_scales):
         axes[0, i].set_title(f'$j={i}$')
 
-    plt.suptitle("NFN width {}, repeat {}, score {}".format(nfn_width, repeat, score))
+    plt.suptitle("NFN width {}, repeat {}, score {:.3e}".format(nfn_width, repeat, score))
 
     print('Average diffs: ', average_diffs)
     print('Mean over filters: ', np.mean(average_diffs))
