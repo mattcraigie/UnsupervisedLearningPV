@@ -5,6 +5,7 @@ import os
 import argparse
 from mocks import *
 from scattering_transform.filters import ClippedMorlet, Morlet
+import torch
 
 def losses_plot(root, techniques, test_type, save_dir):
 
@@ -333,7 +334,7 @@ def plot_morlet_filters():
     morlet = ClippedMorlet(size, J, L)
 
     k = morlet.filters[0][0]
-    x_real =
+    x = torch.fft.fft2()
 
 
     fig, axes = plt.subplots(ncols=3)

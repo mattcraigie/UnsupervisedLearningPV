@@ -144,7 +144,7 @@ if __name__ == '__main__':
             print(folder)
             print(config['analysis_kwargs']['model_kwargs']['subnet_hidden_sizes'])
             model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
-            model.load_state_dict(torch.load(os.path.join(current_read_folder, repeat, 'model.pth')))
+            model.load_state_dict(torch.load(os.path.join(current_read_folder, repeat, 'model.pt')))
 
             filters_final = [filt.clone() for filt in model.filters.filters]
             model.filters.load_state_dict(model.initial_filters_state)
