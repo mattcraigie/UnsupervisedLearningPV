@@ -276,7 +276,6 @@ def plot_toy_data_patches():
     for i in range(10):
         mocks = create_parity_violating_mocks_2d(3, 32, 15, 1, 4, 8)
         single_blue = create_parity_violating_mocks_2d(3, 32, 1, 1, 4, 8)
-        # single_red = create_parity_violating_mocks_2d(3, 32, 1, 1, 4, 8)
 
         fig, axes = plt.subplots(ncols=3, figsize=(12, 4), dpi=300)
         for i, ax in enumerate(axes):
@@ -295,6 +294,7 @@ def plot_toy_data_patches():
 
         plt.tight_layout()
         plt.savefig('/clusterdata/uqmcrai4/UnsupervisedLearningPV/output/plots/toy_data_patches_{}.png'.format(i))
+        plt.close()
 
 
 
