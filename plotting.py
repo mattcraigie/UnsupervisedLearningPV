@@ -326,7 +326,7 @@ def plot_single_triangle():
 
 def plot_morlet_filters():
 
-    size, J, L = 32, 3, 8
+    size, J, L = 32, 3, 4
     morlet = ClippedMorlet(size, J, L)
 
     k = morlet.filters[1][-1]
