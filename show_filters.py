@@ -65,7 +65,7 @@ def save_filters(filters_final, filters_initial, save_dir):
         filt_final = filters_final[j][0].cpu().detach()
         filt_initial = filters_initial[j][0].cpu().detach()
 
-        save_filts = np.zeros((2, filt_final.shape, filt_final.shape))
+        save_filts = np.zeros((2, filt_final.shape[-1], filt_final.shape[-1]))
         save_filts[0] = filt_final
         save_filts[1] = filt_initial
 
