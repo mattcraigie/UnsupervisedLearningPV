@@ -6,6 +6,7 @@ import argparse
 from mocks import *
 from scattering_transform.filters import ClippedMorlet, Morlet
 import torch
+import matplotlib as mpl
 
 def losses_plot(root, techniques, test_type, save_dir):
 
@@ -336,12 +337,31 @@ def plot_morlet_filters():
     fig, axes = plt.subplots(ncols=3, figsize=(12, 5), dpi=300)
 
     axes[0].imshow(k)
-    axes[1].imshow(x.real)
-    axes[2].imshow(x.imag)
 
-    for ax in axes.flatten():
-        ax.set_xticks([])
-        ax.set_yticks([])
+    # rescale x so that zero is white, max is red, min is blue
+    absmin_all = min(-x.real.min().abs(), -x.real.max().abs(), -x.imag.min().abs(), -x.imag.max().abs())
+    absmax_all = max(x.real.min().abs(), x.real.max().abs(), x.imag.min().abs(), x.imag.max().abs())
+
+    normalizer_all = mpl.colors.Normalize(vmin=-absmax_all, vmax=absmax_all)
+
+    # use the normalizers to map the data to colors
+    axes[1].imshow(x.real, cmap='coolwarm', norm=normalizer_all)
+    axes[2].imshow(x.imag, cmap='coolwarm', norm=normalizer_all)
+
+    # add colorbars at the bottom of each subplot, including k
+    cbar_ax = fig.add_axes([0.1, 0.1, 0.8, 0.05])
+    cbar = fig.colorbar(mpl.cm.ScalarMappable(norm=normalizer_all, cmap='coolwarm'), cax=cbar_ax, orientation='horizontal')
+    cbar.set_label('Real')
+
+    cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.05])
+    cbar = fig.colorbar(mpl.cm.ScalarMappable(norm=normalizer_all, cmap='coolwarm'), cax=cbar_ax, orientation='horizontal')
+    cbar.set_label('Imag')
+
+
+
+    # for ax in axes.flatten():
+    #     # ax.set_xticks([])
+    #     # ax.set_yticks([])
     plt.tight_layout()
 
     axes[0].set_title("Fourier Space\n Real", fontsize=16)

@@ -57,6 +57,21 @@ def plot_filter_transformations(filters_final, filters_initial, save_dir, transf
     plt.savefig(os.path.join(save_dir, file_name))
 
 
+def save_filters(filters_final, filters_initial, save_dir):
+
+    num_scales = len(filters_final)
+
+    for j in range(num_scales):
+        filt_final = filters_final[j][0].cpu().detach()
+        filt_initial = filters_initial[j][0].cpu().detach()
+
+        save_filts = np.zeros((2, filt_final.shape, filt_final.shape))
+        save_filts[0] = filt_final
+        save_filts[1] = filt_initial
+
+        np.save(save_dir + f'_{j}', save_filts)
+
+
 def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_width, score):
     num_scales = len(filters_final)
 
@@ -67,6 +82,7 @@ def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_wi
     for j in range(num_scales):
         filt_final = filters_final[j][0].cpu().detach()
         filt_initial = filters_initial[j][0].cpu().detach()
+
         filt_difference = filt_final - filt_initial
         max_abs_value = max(abs(filt_difference.min()), abs(filt_difference.max()))
         norm_difference = Normalize(vmin=-max_abs_value, vmax=max_abs_value)
@@ -88,8 +104,14 @@ def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_wi
     axes[1, 0].set_ylabel('Difference from\nMorlet Initialisation', fontsize=14)
     axes[2, 0].set_ylabel('Inverse Fourier Transform\nof Difference From\nMorlet Initialisation', fontsize=14)
 
+    fs = 18
+
+    # axes[0, 0].set_ylabel('$\hat{\psi}_{\\text{learned}}$', fontsize=fs)
+    # axes[1, 0].set_ylabel('$\hat{\psi}_{\\text{initial}}$', fontsize=fs)
+    # axes[2, 0].set_ylabel('Inverse Fourier Transform\nof Difference From\nMorlet Initialisation', fontsize=fs)
+
     for i in range(num_scales):
-        axes[0, i].set_title(f'$j={i}$')
+        axes[0, i].set_title(f'$j={i}$', fontsize=fs)
 
     plt.suptitle("NFN width {}, repeat {}, score {:.3e}".format(nfn_width, repeat, score))
 
@@ -98,9 +120,6 @@ def final_filters_plot(filters_final, filters_initial, save_path, repeat, nfn_wi
 
     plt.savefig(save_path)
     plt.close()
-
-    # NEXT: MAKE THIS RUN FOR ALL THE MODELS IN THE FOLDER
-
 
 
 if __name__ == '__main__':
@@ -129,6 +148,9 @@ if __name__ == '__main__':
         os.makedirs(args.save_dir)
 
     for i in range(len(all_folders)):
+
+        if i != 6:
+            continue
         folder = all_folders[i]
         nfst_size = all_nfst_sizes[i]
 
@@ -142,6 +164,8 @@ if __name__ == '__main__':
         all_repeats = np.sort(os.listdir(current_read_folder))
 
         for j, repeat in enumerate(all_repeats):
+            if j != 8:
+                continue
 
             model = NFSTRegressor(**config['analysis_kwargs']['model_kwargs'])
             model.load_state_dict(torch.load(os.path.join(current_read_folder, repeat, 'model.pt')))
@@ -153,7 +177,8 @@ if __name__ == '__main__':
 
             out_file = os.path.join(current_output_folder, repeat + '_filters.png')
 
-            final_filters_plot(filters_final, filters_initial, out_file, j, nfst_size, all_test_results[i, j])
+            save_filters(filters_final, filters_initial, current_output_folder)
+            # final_filters_plot(filters_final, filters_initial, out_file, j, nfst_size, all_test_results[i, j])
 
     # tar gzip the entire folder
     shutil.make_archive(args.save_dir, 'gztar', args.save_dir)
