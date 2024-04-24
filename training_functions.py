@@ -1,5 +1,5 @@
 from dlutils.training import RegressionTrainer
-from dlutils.data import DataHandler
+from dlutils.data import DataHandler, RotatedDataset
 import torch
 import numpy as np
 import os
@@ -63,7 +63,8 @@ def train_and_test_model(model_type, model_name, model_kwargs, mock_kwargs, trai
         # we keep a consistent train and validation set across all repeats
         data_handler = DataHandler(train_val_mocks)
         train_loader, val_loader = data_handler.make_dataloaders(batch_size=64, shuffle_split=False,
-                                                                 shuffle_dataloaders=True, val_fraction=0.2)
+                                                                 shuffle_dataloaders=True, val_fraction=0.2,
+                                                                 dataset_class=RotatedDataset)
 
         model = model_class(**model_kwargs)
         model.to(device)
