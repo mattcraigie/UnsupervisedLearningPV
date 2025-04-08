@@ -47,7 +47,7 @@ def make_triangle_mocks(num_mocks, size, a, b, num_triangles, min_scale=1.0, max
     all_mocks = np.zeros((num_mocks, size, size))  # 2D mocks
 
     for i in range(num_mocks):
-        scale = random.uniform(min_scale, max_scale)
+        scale = np.random.uniform(min_scale, max_scale)
         scaled_a = a * scale
         scaled_b = b * scale
         resulting_grid = add_triangle_to_grid(size, scaled_a, scaled_b, num_triangles)
