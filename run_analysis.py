@@ -73,7 +73,7 @@ def pv_detection(config):
         key_2 = 'ratio_left'
     elif analysis_type == 'scale':
         key_1 = 'mock_kwargs'
-        key_2 = 'scales_min'
+        key_2 = 'min_scale'
     else:
         raise ValueError(f"Analysis type {analysis_type} not recognized.")
 
