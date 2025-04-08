@@ -22,13 +22,13 @@ analysis_kwargs:
     ratio_left: 1.0  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
-    poisson_noise_level: [0.25, 0.5, 1.0, 2.0, 4.0]
+    poisson_noise_level: [0.5, 1.0, 1.5, 2.0]
 
   # Training specific configurations
   training_kwargs:
-    epochs: 100
+    epochs: 500
     lr: 0.0001
-    num_train_val_mocks: 100  # Use list of many for data scaling analysis
+    num_train_val_mocks: 1000  # Use list of many for data scaling analysis
     num_test_mocks: 3000
 
 
