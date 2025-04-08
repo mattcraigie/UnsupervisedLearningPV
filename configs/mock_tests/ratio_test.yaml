@@ -2,7 +2,7 @@ analysis_type: "ratio"  # Change to 'data_scaling' as needed
 device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
-  output_root: "//scratch/smp/uqmcrai4/parity/output"  # Directory where the analysis folders will be created
+  output_root: "//pscratch/sd/m/mcraigie/parity/output"  # Directory where the analysis folders will be created
   model_type: "nfst"  # Type of model to be used
   model_name: "nfst"
 
