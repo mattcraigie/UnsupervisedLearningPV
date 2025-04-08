@@ -18,8 +18,8 @@ analysis_kwargs:
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
-    total_num: [8, 16]
-    ratio_left: 1.0  # Use list of many for sensitivity analysis
+    total_num: 16
+    ratio_left: [0.5, 1.0]  # Use list of many for sensitivity analysis
     spirals: true
 
   # Training specific configurations
