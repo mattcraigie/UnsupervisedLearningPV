@@ -24,7 +24,9 @@ def pv_detection(config):
 
     analysis_type = config['analysis_type']
 
-    assert analysis_type in ['sensitivity', 'data_scaling', 'nfst_sizes'], f"Analysis type {analysis_type} not recognized."
+    assert analysis_type in ['sensitivity', 'data_scaling', 'nfst_sizes',
+                              'noise', 'spiral', 'ratio', 'scale'], \
+        f"Analysis type {analysis_type} not recognized."
 
     analysis_config = config['analysis_kwargs']
 
