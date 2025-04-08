@@ -23,6 +23,7 @@ analysis_kwargs:
     length_side1: 4
     length_side2: 8
     min_scale: [0.5,]
+    max_scale: 1.5
 
   # Training specific configurations
   training_kwargs:
