@@ -22,7 +22,7 @@ analysis_kwargs:
     ratio_left: 1.0  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
-    poisson_noise_level: [0.0, 0.25, 0.5, 1.0, 2.0, 4.0]
+    poisson_noise_level: [0.25, 0.5, 1.0, 2.0, 4.0]
 
   # Training specific configurations
   training_kwargs:
