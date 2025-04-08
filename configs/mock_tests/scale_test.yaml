@@ -22,8 +22,7 @@ analysis_kwargs:
     ratio_left: 1.0  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
-    scales_min: [0.5,]
-    scales_max: 1.0
+    min_scale: [0.5,]
 
   # Training specific configurations
   training_kwargs:
