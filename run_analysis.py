@@ -60,6 +60,18 @@ def pv_detection(config):
     elif analysis_type == 'sensitivity':
         key_1 = 'mock_kwargs'
         key_2 = 'ratio_left'
+    elif analysis_type == 'noise':
+        key_1 = 'mock_kwargs'
+        key_2 = 'poisson_noise_level'
+    elif analysis_type == 'spiral':
+        key_1 = 'mock_kwargs'
+        key_2 = 'total_num'
+    elif analysis_type == 'ratio':
+        key_1 = 'mock_kwargs'
+        key_2 = 'ratio_left'
+    elif analysis_type == 'scale':
+        key_1 = 'mock_kwargs'
+        key_2 = 'scales_min'
     else:
         raise ValueError(f"Analysis type {analysis_type} not recognized.")
 
