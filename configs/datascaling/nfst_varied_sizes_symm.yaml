@@ -2,7 +2,7 @@ analysis_type: "nfst_sizes"  # Change to 'data_scaling' as needed
 device: "cuda"  # Change to 'cpu' if needed
 
 analysis_kwargs:
-  output_root: "//scratch/smp/uqmcrai4/parity/output"  # Directory where the analysis folders will be created
+  output_root: "//pscratch/sd/m/mcraigie/parity/output"  # Directory where the analysis folders will be created
   model_type: "nfst"  # Type of model to be used
   model_name: "nfst_symm"
 
@@ -20,7 +20,7 @@ analysis_kwargs:
   # Mock generation specific configurations
   mock_kwargs:
     field_size: 32
-    total_num_triangles: 16
+    total_num: 16
     ratio_left: 1.0  # Use list of many for sensitivity analysis
     length_side1: 4
     length_side2: 8
