@@ -14,7 +14,7 @@ analysis_kwargs:
     subnet_hidden_sizes: [[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128], [256, 256], [512, 512], [1024, 1024]]
     reduction: 'asymm_ang_avg'
     linear_hiddens: 128
-    init_morlet: false
+    init_morlet: true
     symmetric_filters: true
 
   # Mock generation specific configurations
