@@ -4,7 +4,7 @@ device: "cuda"  # Change to 'cpu' if needed
 analysis_kwargs:
   output_root: "//pscratch/sd/m/mcraigie/parity/output"  # Directory where the analysis folders will be created
   model_type: "nfst"  # Type of model to be used
-  model_name: "nfst"
+  model_name: "nfst_lowmocks"
 
   # Model-specific configurations (modify based on the model type)
   model_kwargs:
@@ -27,7 +27,7 @@ analysis_kwargs:
   training_kwargs:
     epochs: 500
     lr: 0.0001
-    num_train_val_mocks: 1000  # Use list of many for data scaling analysis # 1000
+    num_train_val_mocks: 500  # Use list of many for data scaling analysis # 1000
     num_test_mocks: 3000
 
 
